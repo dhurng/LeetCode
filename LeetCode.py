@@ -5,8 +5,7 @@ Leet code problems
 def main():
     test = Solution()
 
-    nums = [1, 1, 2]
-    print test.removeDuplicates(nums)
+    print test.isAnagram("rat", "tar")
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -21,14 +20,255 @@ class Solution(object):
     def __init__(self):
         pass
 
+    def isAnagram(self, s, t):
+        """
+        given two strings, deterine if t is anagram of s
+        contain only lowercase
+        :param s:
+        :param t:
+        :return:
+        """
+        my_dict = {}
+        if (not s) ^ (not t):
+            return False
+        if len(s) != len(t):
+            return False
+        for i in xrange(len(s)):
+            if s[i] not in my_dict.keys():
+                my_dict[s[i]] = 1
+            else:
+                my_dict[s[i]] += 1
+
+        for j in range(len(t)):
+            if t[j] in my_dict.keys():
+                my_dict[t[j]] -= 1
+            else:
+                return False
+
+        for k in my_dict:
+            if my_dict[k] != 0:
+                return False
+
+        return True
+
+    def deleteDuplicates(self, head):
+        """
+        given sorted linked list, delete all duplicates
+        :param head: listnode
+        :return: listnode
+        """
+        if not head:
+            return None
+        if not head.next:
+            return head
+
+        curr = head
+        runner = curr.next
+
+        while curr and runner:
+            if curr.val == runner.val:
+                curr.next = runner.next
+                runner.next = None
+                # runner = curr.next
+            else:
+                curr = runner
+            runner = curr.next
+
+        return head
+
+    def print_list(self, listnode):
+        curr = listnode
+        while curr:
+            print curr
+            curr = curr.next
+
+    def climbStairs(self, n):
+        """
+        climbing staircase, takes n steps to reach the top, each time you either climb
+        1 or 2 steps. how many distinct ways to climb the top?
+        :param n: int
+        :return: int
+        """
+        # if n == 1:
+        #     return 1
+        # if n == 2:
+        #     return 2
+        # return self.climbStairs(n - 1) + self.climbStairsn(n - 2)
+    #     memoization
+        steps = [1,1]
+        while len(steps) < n + 1:
+            steps.append(steps[-1] + steps[-2])
+        return steps[n]
+
+
+    def mySqrt(self, x):
+        """
+        computer and return sqrt of x
+        :param x: int
+        :return: int
+        """
+        a = x
+        b = (a + 1) // 2
+        while b < a:
+            a = b
+            b = (a + x // a) // 2
+        return a
+
+    def addBinary(self, a, b):
+        """
+        given two binary strings, return their sum (also a binary string)
+        :param a: str
+        :param b: str
+        :return: str
+        """
+        if not a or not b:
+            return a or b
+        res = ""
+        carry = 0
+        fill_len = max(len(a), len(b))
+
+        a = a.zfill(fill_len)
+        b = b.zfill(fill_len)
+
+        i = fill_len - 1
+        while i >= 0:
+            sum = int(a[i]) + int(b[i]) + carry
+            if sum == 2:
+                res = res + "0"
+                carry = 1
+            elif sum > 2:
+                res = res + "1"
+                carry = 1
+            else:
+                res = res + str(sum)
+                carry = 0
+            i -= 1
+        if carry == 1:
+            res = res + "1"
+        print "total", res[::-1]
+        return res[::-1]
+
+
+    def plusOne(self, digits):
+        """
+        given non-neg int represented as non-empty array of digits, plus one to int
+        no leading 0s except 0 itself
+        :param digits: list[int]
+        :return: list[int]
+        """
+        end = len(digits) - 1
+        while 0 <= end:
+            if digits[end] < 9:
+                digits[end] += 1
+                return digits
+            else:
+                digits[end] = 0
+            end -= 1
+
+        new_number = []
+        new_number.append(1)
+
+        for i in digits:
+            new_number.append(i)
+        print new_number
+        return new_number
+
+    def lengthOfLastWord(self, s):
+        """
+        given string of upper/lower/empty return the length of last word
+        if not then return 0
+        :param s: str
+        :return: int
+        """
+        # check if only whitespace
+        if not s:
+            return 0
+        s = s.strip()
+        beg = 0
+        end = len(s) - 1
+        while beg <= end:
+            if s[end] != ' ':
+                end -= 1
+            else:
+                break
+        print s[end + 1:]
+        return len(s[end + 1:])
+
+    def maxSubArray(self, nums):
+        """
+        find contiguous subarray within an array(at least 1 number) w/largest sum
+        :param n: int
+        :return: str
+        """
+        if not nums:
+            return 0
+        curr_sum = nums[0]
+        max_sum = nums[0]
+        for n in nums[1:]:
+            curr_sum = max(n, curr_sum + n)
+            max_sum = max(curr_sum, max_sum)
+        return max_sum
+
+
+    def searchInsert(self, nums, target):
+        """
+        given sorted array and target, return index if target is found,
+        else return where it would be if in order
+        :param nums: list[int]
+        :param target: int
+        :return: int
+        """
+        if target > nums[len(nums) - 1]:
+            return len(nums)
+        if target < nums[0]:
+            return 0
+        beg = 0
+        end = len(nums) - 1
+        while beg <= end:
+            mid = (beg + end) / 2
+            if nums[mid] == target:
+                return mid
+            elif nums[mid] > target:
+                end = mid - 1
+            else:
+                beg = mid + 1
+        return beg
+
+    def strStr(self, haystack, needle):
+        """
+        returns index of first occurence of needle in hay or -1
+        :param haystack: str
+        :param needle: str
+        :return: int
+        """
+        for i in range(len(haystack) - len(needle) + 1):
+            if haystack[i:i + len(needle)] == needle:
+                return i
+        return -1
+
+
     def removeElement(self, nums, val):
         """
         given array and val, remove all instance of value in place
-        return new length
+        return new length, order can be changed
         :param nums: list[int]
         :param val: int
-        :return: int 
+        :return: int
         """
+        if not nums:
+            return 0
+        start = 0
+        end = len(nums) - 1
+
+        while start <= end:
+            if nums[start] == val:
+                nums[start] = nums[end]
+                nums[end] = nums[start]
+                end = end - 1
+            else:
+                start += 1
+        print nums
+        return start
 
     def removeDuplicates(self, nums):
         """
