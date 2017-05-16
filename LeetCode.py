@@ -5,7 +5,22 @@ Leet code problems
 def main():
     test = Solution()
 
-    print test.isAnagram("rat", "tar")
+    a = TreeNode(1)
+    b = TreeNode(2)
+    c = TreeNode(3)
+    d = TreeNode(5)
+
+    a.left = b
+
+    e = TreeNode(1)
+    f = TreeNode(2)
+    g = TreeNode(3)
+    h = TreeNode(5)
+
+    e.left = None
+    e.right = f
+
+    print test.isSameTree(a, e)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -16,9 +31,80 @@ class ListNode(object):
     def __str__(self):
         return str(self.val)
 
+# Definition for a binary tree node.
+class TreeNode(object):
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+    def __str__(self):
+        return str(self.val)
+
 class Solution(object):
     def __init__(self):
         pass
+
+    def isSameTree(self, p, q):
+        """
+        given 2 binary trees, check if equal
+        :param p: treeNode
+        :param q: treeNode
+        :return: bool
+        """
+        if p and q:
+            return p.val == q.val and self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)
+        else:
+            return p is q
+
+    def create_list(self, treeNode, res):
+        if not treeNode:
+            return
+        res.append(treeNode.val)
+        if treeNode.left:
+            res.append(self.create_list(treeNode.left, res))
+        if treeNode.right:
+            res.append(self.create_list(treeNode.right, res))
+
+    def merge(self, nums1, m, nums2, n):
+        """
+        Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
+        :type nums1: List[int]
+        :type m: int
+        :type nums2: List[int]
+        :type n: int
+        :rtype: void Do not return anything, modify nums1 in-place instead.
+        """
+        while m > 0 and n > 0:
+            if nums1[m - 1] >= nums2[n - 1]:
+                nums1[m + n - 1] = num1[m - 1]
+                m -= 1
+            else:
+                nums1[m + n - 1] = num2[n - 2]
+                n -= 1
+        if n > 0:
+            nums1[:n] = nums2[:n]
+
+    def binaryTreePaths(self, root):
+        """
+        return all paths from root to leaf
+        :param root: treeNode
+        :return: treeNode
+        """
+        if not root:
+            return []
+        res = []
+        self.binaryTreePaths_helper(root, "", res)
+        return res
+
+    def binaryTreePaths_helper(self, root, ls, res):
+        if not root.left and not root.right:
+            res.append(ls + str(root.val))
+        if root.left:
+            self.binaryTreePaths_helper(root.left, ls + str(root.val) + "->", res)
+        if root.right:
+            self.binaryTreePaths_helper(root.right, ls + str(root.val) + "->", res)
+
 
     def isAnagram(self, s, t):
         """
