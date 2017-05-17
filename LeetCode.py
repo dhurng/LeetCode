@@ -7,20 +7,12 @@ def main():
 
     a = TreeNode(1)
     b = TreeNode(2)
-    c = TreeNode(3)
-    d = TreeNode(5)
+    c = TreeNode(2)
 
     a.left = b
+    a.right = c
 
-    e = TreeNode(1)
-    f = TreeNode(2)
-    g = TreeNode(3)
-    h = TreeNode(5)
-
-    e.left = None
-    e.right = f
-
-    print test.isSameTree(a, e)
+    print test.isSymmetric(a)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -44,6 +36,107 @@ class TreeNode(object):
 class Solution(object):
     def __init__(self):
         pass
+
+    def isBalanced(self, root):
+        """
+        check if tree is height balanced
+        :param root: treeNode
+        :return: bool
+        """
+        if not root:
+            return True
+        return abs(self.isBalanced_helper(root.left) - self.isBalanced_helper(root.right)) <= 1 and \
+                self.isBalanced(root.left) and self.isBalanced(root.right)
+
+    def isBalanced_helper(self, node):
+        if not node:
+            return 0
+        return max(self.isBalanced_helper(node.left), self.isBalanced_helper(node.right)) + 1
+
+
+    def sortedArrayToBST(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: TreeNode
+        """
+        if not nums:
+            return
+        beg = 0
+        end = len(nums) - 1
+        mid = (beg + end) / 2
+
+        root = TreeNode(nums[mid])
+        root.left = self.sortedArrayToBST(nums[:mid])
+        root.right = self.sortedArrayToBST(nums[mid + 1:])
+
+        return root
+
+    def levelOrderBottom(self, root):
+        """
+        given binary tree, return bottom-up traversal, left to right
+        :param root: treeNode
+        :return: List
+        """
+        if not root:
+            return []
+        curr_level = [root]
+        while curr_level:
+            next_level = []
+            for i in curr_level:
+                print i.val
+                if i.left:
+                    next_level.append(i.left)
+                if i.right:
+                    next_level.append(i.right)
+            curr_level = next_level
+
+        print curr_level
+        print next_level
+
+        # if not root:
+        #     return []
+        # res = []
+        # self.levelOrderBottom_helper(root, 0, res)
+        # return res.reverse()
+
+    def levelOrderBottom_helper(self, node, level, res):
+        if node:
+            if len(res) < level + 1:
+                res.append([])
+            res[level].append(node.val)
+            self.levelOrderBottom_helper(node.left, level + 1, res)
+            self.levelOrderBottom_helper(node.right, level + 1, res)
+
+    def maxDepth(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if root is None:
+            return 0
+        return max(self.maxDepth(root.left), self.maxDepth(root.right)) + 1
+
+    def isSymmetric(self, root):
+        """
+        check if mirror of itself
+        :param root: treeNode
+        :return: bool
+        """
+        if not root:
+            return True
+        return self.isSymmetric_helper(root.left, root.right)
+
+    def isSymmetric_helper(self, left, right):
+        if not left and not right:
+            return True
+        if not left or not right:
+            return False
+        if left.val == right.val:
+            outer = self.isSymmetric_helper(left.left, right.right)
+            inner = self.isSymmetric_helper(left.right, right.left)
+            return outer and inner
+        else:
+            return False
 
     def isSameTree(self, p, q):
         """
@@ -75,15 +168,16 @@ class Solution(object):
         :type n: int
         :rtype: void Do not return anything, modify nums1 in-place instead.
         """
-        while m > 0 and n > 0:
-            if nums1[m - 1] >= nums2[n - 1]:
-                nums1[m + n - 1] = num1[m - 1]
+        m, n = m - 1, n - 1
+        while m >= 0 and n >= 0:
+            if nums1[m] > nums2[n]:
+                nums1[m + n + 1] = nums1[m]
                 m -= 1
             else:
-                nums1[m + n - 1] = num2[n - 2]
+                nums1[m + n + 1] = nums2[n]
                 n -= 1
-        if n > 0:
-            nums1[:n] = nums2[:n]
+        if n != -1:  # nums2 is still left
+            nums1[:n + 1] = nums2[:n + 1]
 
     def binaryTreePaths(self, root):
         """
