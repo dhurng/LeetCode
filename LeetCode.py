@@ -12,7 +12,7 @@ def main():
     a.left = b
     a.right = c
 
-    print test.isSymmetric(a)
+    print test.isPalindrome2("A man, a plan, a canal: Panama")
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -34,8 +34,63 @@ class TreeNode(object):
         return str(self.val)
 
 class Solution(object):
-    def __init__(self):
-        pass
+
+    def isPalindrome2(self, s):
+        """
+        check if palindrome
+        :param s: str
+        :return: bool
+        """
+        if s == " ":
+            return True
+        i = 0
+        j = len(s) - 1
+
+        while i < j:
+            while i < j and not s[i].isalpha():
+                i += 1
+            while i < j and not s[j].isalpha():
+                j -= 1
+            if s[i].lower() != s[j].lower():
+                return False
+            i += 1
+            j -= 1
+        return True
+
+
+    def hasPathSum(self, root, sum):
+        """
+        given binary tree and sum, determine if tree has root-leaf path
+        so that adding up all values along path equals to the sum
+        :param root: treeNode
+        :param sum: int
+        :return: bool
+        """
+        return self.hasPathSum_helper(root, 0, sum)
+
+    def hasPathSum_helper(self, node, curr_sum, trget_sum):
+        if not node:
+            return False
+        if not node.left and not node.right:
+            return curr_sum + node.val == trget_sum
+
+        return self.hasPathSum_helper(node.left, curr_sum + node.val, trget_sum) or \
+            self.hasPathSum_helper(node.right, curr_sum + node.val, trget_sum)
+
+    def minDepth(self, root):
+        """
+        find min depth of binary tree, which is number of nodes along the shortest path
+        from root down to nearest leaf node
+        :param root: treeNode
+        :return: int
+        """
+        if not root:
+            return 0
+        if not root.left:
+            return self.minDepth(root.right) + 1
+        if not root.right:
+            return self.minDepth(root.left) + 1
+        return min(self.minDepth(root.left), self.minDepth(root.right)) + 1
 
     def isBalanced(self, root):
         """
