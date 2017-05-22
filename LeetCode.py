@@ -5,14 +5,12 @@ Leet code problems
 def main():
     test = Solution()
 
-    a = TreeNode(1)
-    b = TreeNode(2)
-    c = TreeNode(2)
+    res = []
+    for i in range(1, 8):
+        res.append(i)
+    print res
 
-    a.left = b
-    a.right = c
-
-    print test.isPalindrome2("A man, a plan, a canal: Panama")
+    test.rotate(res, 2)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -34,6 +32,167 @@ class TreeNode(object):
         return str(self.val)
 
 class Solution(object):
+
+    def reverseBits(self, n):
+        """
+        Reverse bits of given 32 bits unsigned int
+        :param n: int
+        :return: int
+        """
+        res = 0
+        for i in xrange(32):
+            res = (res << 1) + (n & 1)
+            n >>= 1
+        return res
+
+    def rotate(self, nums, k):
+        """
+        rotate list nums by k steps
+        :param nums: list[int]
+        :param k: int
+        :return: none do in place
+        """
+        if k is None or k <= 0:
+            return
+        k = k % len(nums)
+        end = len(nums) - 1
+        self.rotate_helper(nums, 0, end - k)
+        self.rotate_helper(nums, end - k + 1, end)
+        self.rotate_helper(nums, 0, end)
+
+        print nums
+
+    def rotate_helper(self, nums, beg, end):
+        while beg < end:
+            temp = nums[beg]
+            nums[beg] = nums[end]
+            nums[end] = temp
+
+            beg += 1
+            end -= 1
+
+
+    def titleToNumber(self, s):
+        """
+        Return number as in excel sheet
+        :param s: str
+        :return: int
+        """
+        nums = [int(x) for x in range(1, 10)]
+        res = 0
+        for i in s:
+            res = 26 * res + int(i, 36) - 9
+        return res
+
+
+    def majorityElement(self, nums):
+        """
+        Given an array of size n, find the majority element. 
+        The majority element is the element that appears more than n/2 times.
+        :param nums: list[int]
+        :return: int 
+        """
+        map = {}
+        for i in nums:
+            if i not in map.keys():
+                map[i] = 1
+            else:
+                map[i] += 1
+        print map
+        freq_val = 0
+        freq_key = 0
+        for val,key in map.iteritems():
+            if key > freq_key:
+                freq_val = val
+                freq_key = key
+        return freq_val
+
+    def convertToTitle(self, n):
+        """
+        given positive integer, return corresponding column title in Excel Sheet
+        :param n: int
+        :return: str
+        """
+        capitals = [chr(x) for x in range(ord('A'), ord('Z') + 1)]
+        res = []
+        while n > 0:
+            res.append(capitals[(n - 1) % 26])
+            n = (n - 1) // 26
+        res.reverse()
+        return ''.join(res)
+
+    def getIntersectionNode(self, headA, headB):
+        """
+        find the node at the intersection of two singly linked lists begins
+        :param headA: listnode
+        :param headB: listnode
+        :return: listnode
+        """
+        if not headA or not headB:
+            return None
+
+        curr_a = headA
+        curr_b = headB
+        a_len = 0
+        while curr_a:
+            curr_a = curr_a.next
+            a_len += 1
+
+        b_len = 0
+        while curr_b:
+            curr_b = curr_b.next
+            b_len += 1
+
+        diff = abs(a_len - b_len)
+        print diff
+
+        longer = headA
+        shorter = headB
+        if b_len > a_len:
+            longer = headB
+            shorter = headA
+
+        while diff > 0:
+            longer = longer.next
+            diff -= 1
+
+        while longer and shorter:
+            if longer is shorter:
+                print "same", longer
+                return True
+            longer = longer.next
+            shorter = shorter.next
+        return False
+
+
+    def hasCycle(self, head):
+        """
+        check if there is a cycle in the list
+        :param head: listnode
+        :return: bool
+        """
+        if not head:
+            return False
+        curr = head
+        runner = curr
+        while runner and runner.next:
+            runner = runner.next.next
+            curr = curr.next
+            if curr == runner:
+                return True
+        return False
+
+    def singleNumber(self, nums):
+        """
+        return which number only appears once
+        :type nums: List[int]
+        :rtype: int
+        """
+        res = 0
+        for n in nums:
+            res ^= n
+        return res
+
 
     def isPalindrome2(self, s):
         """
