@@ -5,12 +5,9 @@ Leet code problems
 def main():
     test = Solution()
 
-    res = []
-    for i in range(1, 8):
-        res.append(i)
-    print res
+    a = [8,4,8,5,9,6,5,4,4,10]
 
-    test.rotate(res, 2)
+    print test.rob(a)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -32,6 +29,46 @@ class TreeNode(object):
         return str(self.val)
 
 class Solution(object):
+
+    def isHappy(self, n):
+        """
+        number is happy: starting with positive int, replace number by the sum
+        of the squares of its digits, repeat process until the number equals 1
+        or loop endlessly in cycle when does not include 1. 
+        :param n: int
+        :return: bool
+        """
+        if not n or n < 0:
+            return False
+        mem = set()
+        while n != 1:
+            print n
+            print "MEM", mem
+            n = self.isHappy_helper(n)
+            if n not in mem:
+                mem.add(n)
+            else:
+                return False
+        return True
+
+    def isHappy_helper(self, n):
+        sum = 0
+        while n > 0:
+            sum += (n % 10) ** 2
+            n /= 10
+        return sum
+
+    def rob(self, nums):
+        """
+        dont take 2 adjacent ints from a list, and get the most sum
+        :param nums: list[int]
+        :return: int
+        """
+        last = 0
+        now = 0
+        for i in nums:
+            last, now = now, max(last + i, now)
+        return now
 
     def reverseBits(self, n):
         """
