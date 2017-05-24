@@ -5,9 +5,7 @@ Leet code problems
 def main():
     test = Solution()
 
-    a = [8,4,8,5,9,6,5,4,4,10]
-
-    print test.rob(a)
+    print test.isIsomorphic("", "")
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -29,6 +27,86 @@ class TreeNode(object):
         return str(self.val)
 
 class Solution(object):
+
+    def isIsomorphic(self, s, t):
+        """
+        isomorphic - char in s can be replaced to get t, preserve order
+        no 2 char can map to same character but can map to itself
+        assume same length
+        :param s: str
+        :param t: str
+        :return: bool
+        """
+        map = {}
+        map2 = {}
+        for pos, char in enumerate(s):
+            if char not in map:
+                map[char] = [pos]
+            else:
+                map[char].append(pos)
+
+        for pos, char in enumerate(t):
+            if char not in map2:
+                map2[char] = [pos]
+            else:
+                map2[char].append(pos)
+
+        return sorted(map.values()) == sorted(map2.values())
+
+    def countPrimes(self, n):
+        """
+        Count the number of prime numbers less than a non-negative number, n.
+        :param n: int
+        :return: int
+        """
+        if n <= 2:
+            return 0
+        prime = [True] * n
+        prime[0] = prime[1] = False
+        for i in xrange(2, n):
+            if prime[i]:
+                for j in xrange(i << 1, n , i):
+                    prime[j] = False
+        count = filter(lambda x: x, prime)
+        print len(count)
+        return len(count)
+
+        # if n <= 2:
+        #     return 0
+        # i = 2
+        # count = 0
+        # while i < n:
+        #     if self.countPrimes_helper(i):
+        #         count += 1
+        #     i += 1
+        # print count
+        # return count
+
+    # takes too long
+    def countPrimes_helper(self, n):
+        for i in xrange(2, n):
+            if n % i == 0:
+                return False
+        return True
+
+    def removeElements(self, head, val):
+        """
+        Remove all elements from a linked list of integers that have value val.
+        :param head: listnode
+        :param val: int
+        :return: listnode
+        """
+        temp = ListNode(0)
+        temp.next = head
+
+        prev, curr = temp, temp.next
+        while curr:
+            if curr.val == val:
+                prev.next = curr.next
+            else:
+                prev = curr
+            curr = curr.next
+        return temp.next
 
     def isHappy(self, n):
         """
@@ -825,11 +903,6 @@ class Solution(object):
         return colors
 
     def lcp(self, s1, s2):
-        """
-        :param s1: str
-        :param s2: str
-        :return:
-        """
         i = 0
         while i < len(s1) and i < len(s2):
             if s1[i] == s2[i]:
