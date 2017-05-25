@@ -2,10 +2,19 @@
 Leet code problems
 """
 
+import collections
+
 def main():
     test = Solution()
 
-    print test.isIsomorphic("", "")
+    obj = MyStack()
+    obj.push(1)
+    obj.push(2)
+    obj.push(3)
+    obj.push(4)
+    # param_2 = obj.pop()
+    # print obj.top()
+    # print obj.empty()
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -26,7 +35,91 @@ class TreeNode(object):
     def __str__(self):
         return str(self.val)
 
+class MyStack(object):
+    def __init__(self):
+        # get to use from both ends!
+        self._queue = collections.deque()
+
+    def push(self, x):
+        q = self._queue
+        q.append(x)
+        for i in range(len(q) - 1):
+            print i, q
+            q.append(q.popleft())
+
+    def pop(self):
+        return self._queue.popleft()
+
+    def top(self):
+        return self._queue[0]
+
+    def empty(self):
+        return not len(self._queue)
+
 class Solution(object):
+
+    def containsNearbyDuplicate(self, nums, k):
+        """
+        Given an array of integers and an integer k, 
+        find out whether there are two distinct indices i and j 
+        in the array such that nums[i] = nums[j] and the absolute 
+        difference between i and j is at most k.
+        :param nums: list[int]
+        :param k:  int
+        :return: bool
+        """
+        map = {}
+        for pos, val in enumerate(nums):
+            print map
+            if val in map and pos - map[val] <= k:
+                return True
+            map[val] = pos
+        return False
+
+    def containsDuplicate(self, nums):
+        """
+        Given an array of integers, find if the array contains any duplicates. 
+        Your function should return true if any value appears at least twice 
+        in the array, and it should return false if every element is distinct.
+        :param nums: list[int]
+        :return: bool
+        """
+        if not nums:
+            return False
+        map = {}
+        for i in range(len(nums)):
+            if nums[i] not in map:
+                map[nums[i]] = 1
+            else:
+                return True
+        return False
+
+
+    def reverseList(self, head):
+        """
+        reverse a singly linked list
+        :param head: listnode
+        :return: listnode
+        """
+        # if not head:
+        #     return None
+        # dummy = ListNode(0)
+        # dummy.next = head
+        #
+        # prev = dummy
+        # curr = dummy.next
+        #
+        # while curr and curr.next:
+        #     curr.next.next = curr
+        #     curr.next = prev
+        self.reverseList_helper(head)
+
+    def reverseList_helper(self, node, prev=None):
+        if not node:
+            return prev
+        n = node.next
+        node.next = prev
+        return self.reverseList_helper(n, node)
 
     def isIsomorphic(self, s, t):
         """
