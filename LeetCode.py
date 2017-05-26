@@ -7,14 +7,7 @@ import collections
 def main():
     test = Solution()
 
-    obj = MyStack()
-    obj.push(1)
-    obj.push(2)
-    obj.push(3)
-    obj.push(4)
-    # param_2 = obj.pop()
-    # print obj.top()
-    # print obj.empty()
+    print test.searchInsert([1,3,5,6], 0)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -908,16 +901,15 @@ class Solution(object):
     def mergeTwoLists(self, l1, l2):
         """
         merge 2 sorted linked lists and return as new list
-        :param l1:
-        :param l2:
-        :return:
+        :param l1: listnode
+        :param l2: listnode
+        :return: listnode
         """
         if not l1 or not l2:
             return l1 or l2
         new = ListNode(0)
         head = new
         while l1 and l2:
-            print "run"
             if l1.val < l2.val:
                 new.next = l1
                 new = new.next
@@ -927,10 +919,8 @@ class Solution(object):
                 new = new.next
                 l2 = l2.next
         if not l1 and l2:
-            print "no more 1"
             new.next = l2
         if not l2 and l1:
-            print "no more 2"
             new.next = l1
         return head.next
 
