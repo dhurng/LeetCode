@@ -110,9 +110,9 @@ class Solution(object):
     def reverseList_helper(self, node, prev=None):
         if not node:
             return prev
-        n = node.next
+        runner = node.next
         node.next = prev
-        return self.reverseList_helper(n, node)
+        return self.reverseList_helper(runner, node)
 
     def isIsomorphic(self, s, t):
         """
