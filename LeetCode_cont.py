@@ -1,31 +1,29 @@
 from LeetCode import MyStack
+import Queue
 
 def main():
     test = Solution()
 
-    a = TreeNode(6)
-    b = TreeNode(2)
-    c = TreeNode(0)
-    d = TreeNode(4)
-    e = TreeNode(3)
-    f = TreeNode(5)
-    g = TreeNode(8)
-    h = TreeNode(7)
-    i = TreeNode(9)
+    # pattern = "abba"
+    # string = "dog dog dog dog"
+    # print test.wordPattern(pattern, string)
+
+    a = TreeNode(3)
+    b = TreeNode(9)
+    c = TreeNode(20)
+    d = TreeNode(15)
+    e = TreeNode(7)
+    f = TreeNode(10)
 
     a.left = b
-    a.right = g
+    a.right = c
 
-    b.left = c
-    b.right = d
+    c.left = d
+    c.right = e
 
-    d.left = e
-    d.right = f
+    b.left = f
 
-    g.left = h
-    g.right = i
-
-    test.lowestCommonAncestor(a, e, f)
+    test.levelOrder(a)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -50,12 +48,264 @@ class Solution(object):
     def __init__(self):
         pass
 
-    def deleteNode(self, node):
+
+    def max_height(self, root):
+        if not root:
+            return 0
+        return max(self.max_height(root.left), self.max_height(root.right)) + 1
+
+    def levelOrder(self, root):
+        if not root:
+            return []
+        q = Queue.Queue()
+        q.put(root)
+
+        while not q.empty():
+            temp = q.get()
+            print temp
+            if temp.left:
+                q.put(temp.left)
+            if temp.right:
+                q.put(temp.right)
+
+
+    def levelOrder_2(self, root):
         """
-        
-        :param node: 
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        if not root:
+            return []
+        q = []
+        res = []
+        q.append(root)
+        dummy = TreeNode(-99999999)
+        q.append(dummy)
+        self.lvl(root, dummy, q, res)
+
+        for i in res:
+            for j in i:
+                print j
+            print "*"
+        return res
+
+    def lvl(self, node, dummy, q, res):
+        list = []
+        while len(q) != 0:
+            temp = q.pop(0)
+
+            if temp.val != dummy.val:
+                if temp.left:
+                    q.append(temp.left)
+                if temp.right:
+                    q.append(temp.right)
+                list.append(temp)
+            else:
+                res.append(list)
+                list = []
+                if len(q) > 0:
+                    q.append(dummy)
+
+
+    def wordPattern(self, pattern, str):
+        """
+        Given pattern and string, find if string follows same pattern
+        :param pattern: str
+        :param str: str
+        :return: bool
+        """
+        if not pattern and not str:
+            return True
+        if not pattern or not str:
+            return False
+
+        map = {}
+        j = 0
+        for i in pattern:
+            pos = self.get_substring(str, j)
+            substring = str[j:pos]
+            print "SUB", substring
+            j = pos + 1
+
+            if i not in map.keys():
+                map[i] = substring
+
+            else:
+                if map.get(i) != substring:
+                    return False
+        print map
+        return True
+
+    def get_substring(self, word, j):
+        k = j + 1
+        while k < len(word):
+            if word[k] == " ":
+                break
+            k += 1
+        return k
+
+    def moveZeroes(self, nums):
+        """
+        Given nums, move all 0s to end while keeping order
+        :param nums: list[int]
+        :return: none doing it in place
+        """
+        if not nums:
+            return []
+        i = 0
+        for j in xrange(1, len(nums)):
+            if nums[i] == 0:
+                if nums[j] != 0:
+                    nums[i] = nums[j]
+                    nums[j] = 0
+                else:
+                    continue
+            i += 1
+        print nums
+
+    def firstBadVersion(self, n):
+        """
+        suppose [1,2,...,n] want to find first bad one,
+        following is rest is bad, given api isBadVersion
+        :param n: int
+        :return: int
+        """
+        beg = 1
+        end = n - 1
+        while beg <= end:
+            mid = (beg + end) / 2
+            if isBadVersion(mid):
+                end = mid - 1
+            else:
+                beg = mid + 1
+        return beg
+
+    def missingNumber(self, nums):
+        """
+        Given array containing n distinct nums taken from 0,1,2,...,n
+        find one that is missing from array
+        :param nums: list[int]
+        :return: int
+        """
+        sums = sum(nums)
+        n = len(nums)
+
+        ideal_sum = n * (n + 1) / 2
+        print ideal_sum - sums
+        return ideal_sum - sums
+
+    def isUgly(self, num):
+        """
+        Check if ugly = pos num whose prime only 2,3,5
+        :param num: 
         :return: 
         """
+        if num <= 0:
+            return False
+        ugliness = [2,3,5]
+        for i in ugliness:
+            while num % i == 0:
+                num //= i
+        return num == 1
+
+
+    def addDigits(self, num):
+        """
+        Given non-neg int, repeatedly add all digits until result has only 1 digit
+        :param num: int
+        :return: int
+        """
+        # or if you know math tricks
+        # return num if num == 0 else num % 9 or 9
+        if num <= 0:
+            return 0
+
+        sum = num
+        while sum > 9:
+            sum = self.addDigits_helper(sum)
+        print sum
+        return sum
+
+    def addDigits_helper(self, num):
+        sum = 0
+        while num > 0:
+            right = num % 10
+            sum += right
+            num //= 10
+        return sum
+
+    def binaryTreePaths(self, root):
+        """
+        given binary tree, return all the paths
+        :param root: treeNode
+        :return: list[treeNodes]
+        """
+        if not root:
+            return []
+        res = []
+        self.binaryTreePaths_helper(root, "", res)
+
+        return res
+
+    def binaryTreePaths_helper(self, node, ls, res):
+        if not node.left and not root.right:
+            res.append(ls + str(root.val))
+        if root.left:
+            self.binaryTreePaths_helper(root.left, ls + str(root.val) + '->', res)
+        if root.right:
+            self.binaryTreePaths_helper(root.right, ls + str(root.val) + '->', res)
+
+        res.append(node.val)
+        # deal with lefts here?
+        # at leaf so stop and begin from root again
+        if not node.left and not node.right:
+            self.binaryTreePaths_helper(node.left, res)
+            self.binaryTreePaths_helper(node.right, res)
+
+    def isAnagram(self, s, t):
+        """
+        check if t is anagram of s, assume only lowercase, what if unicode?
+        :param s: str
+        :param t: str
+        :return: bool
+        """
+    #     just need to know if same letter and number of them
+        my_dict = {}
+        if not s and not t:
+            return True
+        if not s or not t:
+            return False
+        if len(s) != len(t):
+            return False
+        for i in xrange(len(s)):
+            if s[i] not in my_dict.keys():
+                my_dict[s[i]] = 1
+            else:
+                my_dict[s[i]] += 1
+        for j in range(len(t)):
+            if t[j] in my_dict.keys():
+                my_dict[t[j]] -= 1
+            else:
+                return False
+        for k in my_dict:
+            if my_dict[k] != 0:
+                return False
+        return True
+
+
+    def deleteNode(self, node):
+        """
+        delete node(except tail), given only access to that node
+        :param node: listnode
+        :return: none, modify in place
+        """
+        node.val = node.next.val
+        node.next = node.next.next
+
+
+    def deleteNode(self, node):
+        node.val = node.next.val
+        node.next = node.next.next
 
     def lowestCommonAncestor(self, root, p, q):
         """
@@ -65,22 +315,30 @@ class Solution(object):
         :param q: treenode
         :return: treenode
         """
-        p_stack = []
-        q_stack = []
+        # using no space
+        if root.val > max(p.val, q.val):
+            return self.lowestCommonAncestor(root.left, p, q)
+        elif root.val < min(p.val, q.val):
+            return self.lowestCommonAncestor(root.right, p, q)
+        else:
+            return root
 
-        self.lowestCommonAncestor_helper(root, p, p_stack)
-        self.lowestCommonAncestor_helper(root, q, q_stack)
-
-        if not p_stack or not q_stack:
-            return None
-
-        i = 0
-        while i < len(p_stack) and i < len(q_stack):
-            if p_stack[i] != q_stack[i]:
-                break
-            i += 1
-        print p_stack[i - 1]
-        return p_stack[i - 1]
+        # p_stack = []
+        # q_stack = []
+        #
+        # self.lowestCommonAncestor_helper(root, p, p_stack)
+        # self.lowestCommonAncestor_helper(root, q, q_stack)
+        #
+        # if not p_stack or not q_stack:
+        #     return None
+        #
+        # i = 0
+        # while i < len(p_stack) and i < len(q_stack):
+        #     if p_stack[i] != q_stack[i]:
+        #         break
+        #     i += 1
+        # print p_stack[i - 1]
+        # return p_stack[i - 1]
 
     def lowestCommonAncestor_helper(self, root, node, stack):
         if not root:
@@ -92,6 +350,19 @@ class Solution(object):
             self.lowestCommonAncestor_helper(root.right, node, stack)
         else:
             return root
+
+    def lowestCommonAncestor_notbst(self, root, n1, n2):
+        if not root:
+            return None
+        if root == n1 or root == n2:
+            return root
+        left = self.lowestCommonAncestor_notbst(root.left, n1, n2)
+        right = self.lowestCommonAncestor_notbst(root.right, n1, n2)
+        if left and right:
+            return root
+        if not left and not right:
+            return None
+        return left if left else right
 
     def isPalindrome(self, head):
         """
@@ -166,8 +437,6 @@ class Solution(object):
                 return False
             n /= 2
         return True
-
-
 
     def invertTree(self, root):
         """

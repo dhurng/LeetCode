@@ -624,7 +624,7 @@ class Solution(object):
         :return:
         """
         my_dict = {}
-        if (not s) ^ (not t):
+        if not s or not t:
             return False
         if len(s) != len(t):
             return False
@@ -1014,6 +1014,11 @@ class Solution(object):
         return True if x - rev == 0 else False
 
     def no_space_reverse(self, x):
+        """
+        technically not no space since underneath it does create a copy
+        :param x: 
+        :return: 
+        """
         if x > 0:
             return int(str(x)[::-1])
         else:
