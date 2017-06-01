@@ -1,6 +1,7 @@
 from LeetCode import MyStack
 import Queue
 
+
 def main():
     test = Solution()
 
@@ -23,7 +24,9 @@ def main():
 
     b.left = f
 
-    test.levelOrder(a)
+    # print test.wordPattern("abba", "dog cat cat dog")
+    print test.isPowerOfThree(45)
+
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -48,6 +51,97 @@ class Solution(object):
     def __init__(self):
         pass
 
+    def reverseString(self, s):
+        """
+        reverse a string
+        :param s: str
+        :return: str
+        """
+        
+
+    def isPowerOfFour(self, num):
+        """
+        Determine if power of 4
+        :param num: int
+        :return: bool
+        """
+        """
+        num within 32 bit and turn into binary and xor would be 
+        1010101010101010101010101010101
+        any power of 4 is also power of 2
+        
+        or take log of num on base 4 and if res is int then true
+        
+        or keep dividing by 4 if n%4 is not 0 
+        """
+        # return num != 0 and num &(num-1) == 0 and num & 1431655765== num
+        if n <= 0:
+            return False
+        while n != 1:
+            if n % 4 != 0:
+                return False
+            n /= 4
+        return True
+
+
+    def isPowerOfThree(self, n):
+        """
+        Determine if power of 3
+        :param n: int
+        :return: bool
+        """
+        #  1162261467 is the largest pow of 3 in the int
+        return n > 0 and 1162261467 % n == 0
+
+    def canWinNim(self, n):
+        """
+        Each turn to remove 1 - 3 stones, one to remove last wins
+        determine if you can win by number of stones in heap
+        :param n: int
+        :return: bool
+        """
+        return True if n % 4 == 1 else False
+
+    def hasPathSum(self, root, sum):
+        if not root:
+            return None
+        if not root.left and not root.right:
+            if sum == root.val:
+                return True
+            else:
+                return False
+        return self.hasPathSum(root.left, sum - root.val) or self.hasPathSum(root.right, sum - root.val)
+
+        # if self.hasPathSum(root.left, sum - root.val):
+        #     return True
+        # if self.hasPathSum(root.right, sum - root.val):
+        #     return True
+        # return False
+
+
+    def levelOrderBottom(self, root):
+        """
+        bottom up level traversal of binary tree
+        :param root: treenode
+        :return: list[list[int]]
+        """
+        if not root:
+            return None
+        q = Queue.Queue()
+        stack= []
+        q.put(root)
+
+        while not q.empty():
+            temp = q.get()
+            if temp.left:
+                q.put(temp.left)
+            if temp.right:
+                q.put(temp.right)
+            stack.append(temp)
+
+
+        while len(stack) != 0:
+            print stack.pop()
 
     def max_height(self, root):
         if not root:
@@ -55,32 +149,18 @@ class Solution(object):
         return max(self.max_height(root.left), self.max_height(root.right)) + 1
 
     def levelOrder(self, root):
-        if not root:
-            return []
-        q = Queue.Queue()
-        q.put(root)
-
-        while not q.empty():
-            temp = q.get()
-            print temp
-            if temp.left:
-                q.put(temp.left)
-            if temp.right:
-                q.put(temp.right)
-
-
-    def levelOrder_2(self, root):
         """
+        level traversal of binary tree
         :type root: TreeNode
         :rtype: List[List[int]]
         """
         if not root:
             return []
-        q = []
+        q = Queue.Queue()
         res = []
-        q.append(root)
+        q.put(root)
         dummy = TreeNode(-99999999)
-        q.append(dummy)
+        q.put(dummy)
         self.lvl(root, dummy, q, res)
 
         for i in res:
@@ -91,20 +171,20 @@ class Solution(object):
 
     def lvl(self, node, dummy, q, res):
         list = []
-        while len(q) != 0:
-            temp = q.pop(0)
+        while not q.empty():
+            temp = q.get()
 
             if temp.val != dummy.val:
                 if temp.left:
-                    q.append(temp.left)
+                    q.put(temp.left)
                 if temp.right:
-                    q.append(temp.right)
+                    q.put(temp.right)
                 list.append(temp)
             else:
                 res.append(list)
                 list = []
-                if len(q) > 0:
-                    q.append(dummy)
+                if not q.empty():
+                    q.put(dummy)
 
 
     def wordPattern(self, pattern, str):
@@ -122,19 +202,19 @@ class Solution(object):
         map = {}
         j = 0
         for i in pattern:
+            # return last position
             pos = self.get_substring(str, j)
             substring = str[j:pos]
             print "SUB", substring
             j = pos + 1
 
-            if i not in map.keys():
+            if i not in map.keys() and substring not in map.values():
                 map[i] = substring
-
             else:
                 if map.get(i) != substring:
                     return False
         print map
-        return True
+        return True if pos == len(str) else False
 
     def get_substring(self, word, j):
         k = j + 1
@@ -500,6 +580,47 @@ class MyQueue(object):
         :rtype: bool
         """
         return True if not self.stack1 else False
+
+"""
+Given an integer arr nums, find sum of elements between i and j (i <= j) incl
+"""
+class NumArray(object):
+    def __init__(self, nums):
+        """
+        assume arr does not change
+        Many calls to sumrange func
+        :type nums: List[int]
+        """
+        self.nums = nums
+        self.map = {-1:0}
+        for pos,val in enumerate(nums):
+            self.map[pos] = self.map[pos - 1] + val
+        print self.map
+
+    def sumRange(self, i, j):
+        """
+        :type i: int
+        :type j: int
+        :rtype: int
+        """
+        return self.map[j] - self.map[i - 1]
+
+        # sum = 0
+        # while i <= j:
+        #     sum += self.nums[i]
+        #     i += 1
+        # print "sum", sum
+        # return sum
+
+# a = [-2, 0, 3, -5, 2, -1]
+# tester = NumArray(a)
+# print tester.nums
+# print "**"
+# print tester.sumRange(0,2)
+# print "*"
+# print tester.sumRange(2,5)
+# print "*"
+# print tester.sumRange(0,5)
 
 if __name__ == '__main__':
     main()
