@@ -1,5 +1,6 @@
 from LeetCode import MyStack
 import Queue
+import sys
 
 
 def main():
@@ -21,11 +22,9 @@ def main():
     c.left = d
     c.right = e
 
-    a = "abccccdd"
-    b = "Aa"
-    c = "ccc"
-    d = "bananas"
-    test.longestPalindrome(c)
+    a = ", , , ,        a, eaefa"
+    b = "  Hello World"
+    print test.countSegments(a)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -50,7 +49,162 @@ class Solution(object):
     def __init__(self):
         pass
 
-    
+    def countSegments(self, s):
+        """
+        Count num of segments in str, where seg is contiguous seq of non space char
+        :param s: str
+        :return: int
+        """
+        s = s.strip()
+        if not s:
+            return 0
+        count = 0
+        i = 0
+        j = i + 1
+        while j < len(s):
+            if s[j] == " " and s[i] != " ":
+                count += 1
+                i = j
+            else:
+                i = j
+            j += 1
+        if i != j:
+            count += 1
+
+        print count
+        return count
+
+        # s = s.strip()
+        # if not s:
+        #     return 0
+        #
+        # print s
+        # count = 0
+        # i = 0
+        # j = i + 1
+        # while j < len(s):
+        #     if s[j] == " " and s[i] != " ":
+        #         count += 1
+        #         i = j + 1
+        #     j += 1
+        #
+        # if i != j:
+        #     count += 1
+        #
+        # print count
+        # return count
+
+    def addStrings(self, num1, num2):
+        """
+        2 non-neg ints rep as sring, return sum
+        :param num1: str
+        :param num2: str
+        :return: str
+        """
+        map = {'0': 0, '1':1, '2':2 , '3': 3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9}
+        if not num1 or not num2:
+            return num1 or num2
+
+        if len(num1) < len(num2):
+            shorter = num1
+            longer = num2
+        else:
+            shorter = num2
+            longer = num1
+
+        diff = len(longer) - len(shorter)
+        new = []
+        for i in range(diff):
+            new.append("0")
+        for j in shorter:
+            new.append(j)
+
+        shorter = ''.join(new)
+
+        print longer, shorter
+
+        k = len(longer) - 1
+        carry = 0
+        res = []
+
+        while k >= 0:
+            if shorter[k] in map and longer[k] in map:
+                sum = map[shorter[k]] + map[longer[k]] + carry
+                if sum > 9:
+                    carry = 1
+                    res.append(str(sum % 10))
+                else:
+                    carry //= 10
+                    res.append(str(sum))
+            k -= 1
+
+        if carry > 0:
+            res.append(str(carry))
+
+        res = ''.join(res[::-1])
+        return res
+
+
+    def thirdMax(self, nums):
+        """
+        non-empty arr of int, return 3rd max number in arr, else max number
+        must be linear runtime
+        :param nums: list[int]
+        :return: int
+        """
+        # nums = set(nums)
+        # print nums
+        # if len(nums) < 3:
+        #     return max(nums)
+        # nums.remove(max(nums))
+        # nums.remove(max(nums))
+        # return max(nums)
+
+
+        max = -sys.maxint
+        max_2 = -sys.maxint
+        max_3 = -sys.maxint
+
+        for i in nums:
+            if i > max:
+                max = i
+
+        for j in nums:
+            if j > max_2 and j != max:
+                max_2 = j
+
+        for k in nums:
+            if k > max_3 and k != max and k != max_2:
+                max_3 = k
+
+        if max_3 == -sys.maxint:
+            return max
+
+        return max_3
+
+    def fizzBuzz(self, n):
+        """
+        Output string representation of numbers from 1 to n, but multiples of 3 are Fizz
+        5 is Buzz, and 3 and 5 are FizzBuzz
+        :param n: int
+        :return: str
+        """
+        res = []
+        for i in range(1, n + 1):
+            if i % 3 == 0 and i % 5 == 0:
+                print "FizzBuzz"
+                res.append("FizzBuzz")
+            elif i % 3 == 0:
+                print "Fizz"
+                res.append("Fizz")
+            elif i % 5 == 0:
+                print "Buzz"
+                res.append("Buzz")
+            else:
+                res.append(str(i))
+        print res
+        return res
+
 
     def longestPalindrome(self, s):
         """
