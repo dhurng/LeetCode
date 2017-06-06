@@ -14,7 +14,6 @@ def main():
     c = TreeNode(20)
     d = TreeNode(15)
     e = TreeNode(7)
-    f = TreeNode(10)
 
     a.left = b
     a.right = c
@@ -22,11 +21,11 @@ def main():
     c.left = d
     c.right = e
 
-    b.left = f
-
-    # print test.wordPattern("abba", "dog cat cat dog")
-    print test.isPowerOfThree(45)
-
+    a = "abccccdd"
+    b = "Aa"
+    c = "ccc"
+    d = "bananas"
+    test.longestPalindrome(c)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -51,13 +50,265 @@ class Solution(object):
     def __init__(self):
         pass
 
+    
+
+    def longestPalindrome(self, s):
+        """
+        Given a string, find lenght of longest palindrome that can be built
+        it is case sensative
+        :param s: str
+        :return: int
+        """
+        if not s:
+            return 0
+
+        map = {}
+        for i in s:
+            if i not in map:
+                map[i] = 1
+            else:
+                map[i] += 1
+        print map
+
+        count_odd = 0
+        res = 0
+        for j in map.values():
+            if j % 2 == 0:
+                res += j
+            else:
+                res += j - 1
+                count_odd = 1
+
+        print "res", res + count_odd
+        return res
+
+    def toHex(self, num):
+        """
+        Given an int, convert to hex, for neg use two's complement
+        :param num: int
+        :return: str
+        """
+        res = []
+        dict = {10: "a", 11: "b", 12: "c", 13: "d", 14: "e", 15: "f"}
+        if num == 0:
+            return "0"
+        if num < 0:
+            num = num + 2 ** 32
+
+        while num > 0:
+            digit = num % 16
+            num = (num - digit) / 16
+            if digit > 9 and digit < 16:
+                digit = dict[digit]
+            else:
+                digit = str(digit)
+            res.append(digit)
+        return "".join(res[::-1])
+
+    def sumOfLeftLeaves(self, root):
+        """
+        Find sum of all left leaves in given binary tree
+        :param root: treenode
+        :return: int
+        """
+        if not root:
+            return 0
+        if root.left and not root.left.left and not root.left.right:
+            return root.left.val + self.sumOfLeftLeaves(root.right)
+        return self.sumOfLeftLeaves(root.left) + self.sumOfLeftLeaves(root.right)
+
+    def findNthDigit(self, n):
+        """
+        find nth DIGIT of inifinite int sequence 0 < n < 2^31
+        :param n: int
+        :return: int
+        """
+        n -= 1
+        for digits in range(1, 11):
+            first = 10 ** (digits - 1)
+            if n < 9 * first * digits:
+                return int(str(first + n / digits))[n%digits]
+            n -= 9 * first * digits
+
+    def findTheDifference(self, s, t):
+        """
+        two strings, t is random string of s but add 1 more letter
+        find the letter
+        :param s: str
+        :param t: str
+        :return: str
+        """
+        if not s:
+            return t[-1]
+        map = {}
+        for i in s:
+            if i not in map:
+                map[i] = 1
+            else:
+                map[i] += 1
+        print map
+        for j in t:
+            if j in map:
+                map[j] -= 1
+            else:
+                return j
+
+        for k, l in map.iteritems():
+            if l == -1:
+                return k
+
+
+    def firstUniqChar(self, s):
+        """
+        find first non-repeating character and return index else -1
+        :param s: str
+        :return: int
+        """
+        if not s:
+            return -1
+        map = {}
+        for i in s:
+            if i not in map:
+                map[i] = 1
+            else:
+                map[i] += 1
+
+        for j, k in enumerate(s):
+            if map[k] == 1:
+                print j, k
+                return j
+        return -1
+
+    def canConstruct(self, ransomNote, magazine):
+        """
+        check if ransomnote can be constructed from magazine
+        :param ransomNote: str
+        :param magazine: str
+        :return: bool
+        """
+        if not ransomNote:
+            return True
+        if not magazine:
+            return False
+        if len(magazine) < len(ransomNote):
+            return False
+
+        map = {}
+        for i in magazine:
+            if i not in map:
+                map[i] = 1
+            else:
+                map[i] += 1
+        print map
+
+        for j in ransomNote:
+            if j not in map:
+                return False
+            else:
+                map[j] -= 1
+
+        for k in map.values():
+            if k < 0:
+                return False
+        return True
+
+    def isPerfectSquare(self, num):
+        """
+        Given positive int num, check if num is perfect square
+        :param num: int
+        :return: bool
+        """
+        if num < 0: return False
+        if num <= 1: return True
+        half = num // 2
+        s = set([half])
+        while half * half != num:
+            half = (half + (num // half)) // 2
+            if half in s:
+                return False
+            s.add(half)
+        return True
+
+    def intersect(self, nums1, nums2):
+        """
+        Given 2 arrays, compute intersection can have dups
+        :param nums1: list[int]
+        :param nums2: list[int]
+        :return: list[int]
+        """
+        dict1 = {}
+        for i in nums1:
+            if i not in dict1:
+                dict1[i] = 1
+            else:
+                dict1[i] += 1
+
+        print dict1
+        res = []
+
+        for i in nums2:
+            if i in dict1 and dict1[i] > 0:
+                res.append(i)
+                dict1[i] -= 1
+        return res
+
+
+    def intersection(self, nums1, nums2):
+        """
+        Given 2 arrays, compute intersection
+        :param nums1: list[int]
+        :param nums2: list[int]
+        :return: list[int]
+        """
+        a = set(nums1)
+        b = set(nums2)
+        res = set()
+
+        for i in a:
+            if i in b:
+                res.add(i)
+        print "res", res
+        return res
+
+    def reverseVowels(self, str):
+        """
+        reverse only the vowels
+        :param s: str
+        :return: str
+        """
+        if not str:
+            return ""
+        vowels = ["a", "e", "i", "o", "u"]
+        beg = 0
+        end = len(str) - 1
+
+        s = []
+        for i in str:
+            s.append(i)
+        print s
+
+        while beg <= end:
+            if s[beg] in vowels:
+                if s[end] in vowels:
+                    temp = s[beg]
+                    s[beg] = s[end]
+                    s[end] = temp
+                    beg += 1
+                    end -= 1
+                else:
+                    end -= 1
+            else:
+                beg += 1
+        print ''.join(s)
+
     def reverseString(self, s):
         """
         reverse a string
         :param s: str
         :return: str
         """
-        
+        print s
+        return s[::-1]
 
     def isPowerOfFour(self, num):
         """
@@ -357,6 +608,7 @@ class Solution(object):
             return False
         if len(s) != len(t):
             return False
+
         for i in xrange(len(s)):
             if s[i] not in my_dict.keys():
                 my_dict[s[i]] = 1
@@ -379,11 +631,6 @@ class Solution(object):
         :param node: listnode
         :return: none, modify in place
         """
-        node.val = node.next.val
-        node.next = node.next.next
-
-
-    def deleteNode(self, node):
         node.val = node.next.val
         node.next = node.next.next
 
