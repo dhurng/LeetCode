@@ -6,31 +6,40 @@ import sys
 def main():
     test = Solution()
 
-    # pattern = "abba"
-    # string = "dog dog dog dog"
-    # print test.wordPattern(pattern, string)
-
-    a = TreeNode(3)
-    b = TreeNode(9)
-    c = TreeNode(20)
-    d = TreeNode(15)
-    e = TreeNode(7)
+    a = TreeNode(10)
+    b = TreeNode(5)
+    c = TreeNode(-3)
+    d = TreeNode(3)
+    e = TreeNode(2)
+    f = TreeNode(11)
+    g = TreeNode(3)
+    h = TreeNode(-2)
+    i = TreeNode(1)
 
     a.left = b
     a.right = c
 
-    c.left = d
-    c.right = e
+    b.left = d
+    b.right = e
 
-    a = ", , , ,        a, eaefa"
-    b = "  Hello World"
-    print test.countSegments(a)
+    c.right = f
+
+    d.left = g
+    d.right = h
+
+    e.right = i
+
+    test.print_tree(a)
+    print "****"
+    test.pre_order_NoRec(a)
 
 # Definition for singly-linked list.
 class ListNode(object):
     def __init__(self, x):
         self.val = x
         self.next = None
+        self.prev = None
+        self.child = None
 
     def __str__(self):
         return str(self.val)
@@ -49,13 +58,189 @@ class Solution(object):
     def __init__(self):
         pass
 
+    def avg(self, nums):
+        """
+        :param nums: Actualy a stream of data, but just put it into the list 
+        :return: list[int]
+        """
+        pass
+
+    def pre_order_NoRec(self, root):
+        """
+        no recursion preorder 
+        :param root: treenode
+        :return: none just print
+        """
+        if not root:
+            return
+        stack = []
+        stack.append(root)
+        while len(stack) != 0:
+            curr = stack.pop()
+            print curr
+            if curr.right:
+                stack.append(curr.right)
+            if curr.left:
+                stack.append(curr.left)
+
+
+    def find_height(self, root):
+        if not root:
+            return 0
+        left = self.find_height(root.left)
+        right = self.find_height(root.right)
+        return max(right, left) + 1
+
+    def pre_order(self, root):
+        if not root:
+            return None
+        print root
+        self.pre_order(root.left)
+        self.pre_order(root.right)
+
+    def in_order(self, root):
+        if not root:
+            return None
+        self.pre_order(root.left)
+        print root
+        self.pre_order(root.right)
+
+    def post_order(self, root):
+        if not root:
+            return None
+        self.pre_order(root.left)
+        self.pre_order(root.right)
+        print root
+
+
+    def search_BST(self, root, trgt):
+        if not root:
+            return None
+        if root.val == trgt:
+            return root
+        elif root.val < trgt:
+            return self.search_BST(root.right, trgt)
+        else:
+            return self.search_BST(root.left, trgt)
+
+        # while root:
+        #     if root.val == trgt:
+        #         return root
+        #     elif root.val < trgt:
+        #         root = root.left
+        #     else:
+        #         root = root.right
+        # return root
+
+    def check_cycle(self, head):
+        """
+        Determine is list is cyclic or not
+        :param head: listnode
+        :return: bool
+        """
+        if not head:
+            return False
+        curr = head
+        runner = curr.next
+
+        while runner and runner.next:
+            runner = runner.next.next
+            curr = curr.next
+            if curr is runner:
+                return True
+        return False
+
+
+    def flatten_linked(self, head, tail):
+        """
+        Flatten a multi layered linked list into 1
+        :param head: listnode
+        :param tail: listnode
+        :return: listnode
+        """
+        curr = head
+        while curr:
+            if curr.child:
+                self.append(tail, curr.child)
+            curr = curr.next
+        return head
+
+    def append(self, tail, node):
+        tail.next = node
+        node.prev = tail
+
+        curr = node
+        while curr.next:
+            curr = curr.prev
+        tail = curr
+
+        # OR
+        #
+        # uses an extra data struct
+        # curr = head
+        # stack = []
+        # while curr:
+        #     if curr.child and curr.next:
+        #         # save the next
+        #         stack.append(curr.next)
+        #         curr.next = curr.child
+        #         curr.child = None
+        #         curr = curr.next
+        #     elif not curr.child and curr.next:
+        #         curr = curr.next
+        #     #     curr has no child and no next
+        #     else:
+        #         if len(stack) != 0:
+        #             popped = stack.pop()
+        #             curr.next = popped
+
+
+
+    def mth_last(self, head, m):
+        if not head:
+            return None
+        curr = head
+        runner = curr.next
+
+        count = 0
+        while runner and count < m:
+            runner = runner.next
+            count += 1
+        while runner:
+            curr = curr.next
+            runner = runner.next
+
+        print curr
+        return curr
+
+    def reverse_sent(self, sent):
+        res = sent.strip()
+        res = res.split(" ")
+
+        for i,j in enumerate(res):
+            res[i] = j[::-1]
+
+        print ' '.join(res)
+
+
+    def pathSum(self, root, sum):
+        """
+        Each node has val, find number of paths that sum to given value
+        does not need to start or end at root or leaf but trav downwards
+        :param root: treenode
+        :param sum: int
+        :return: int
+        """
+
+
+        print "root", root
+
     def countSegments(self, s):
         """
         Count num of segments in str, where seg is contiguous seq of non space char
         :param s: str
         :return: int
         """
-        s = s.strip()
         if not s:
             return 0
         count = 0
@@ -68,31 +253,11 @@ class Solution(object):
             else:
                 i = j
             j += 1
-        if i != j:
+        if i != j and s[i] != " ":
             count += 1
 
         print count
         return count
-
-        # s = s.strip()
-        # if not s:
-        #     return 0
-        #
-        # print s
-        # count = 0
-        # i = 0
-        # j = i + 1
-        # while j < len(s):
-        #     if s[j] == " " and s[i] != " ":
-        #         count += 1
-        #         i = j + 1
-        #     j += 1
-        #
-        # if i != j:
-        #     count += 1
-        #
-        # print count
-        # return count
 
     def addStrings(self, num1, num2):
         """
@@ -432,7 +597,7 @@ class Solution(object):
         """
         if not str:
             return ""
-        vowels = ["a", "e", "i", "o", "u"]
+        vowels = ["a", "e", "i", "o", "u", "A", "E","I","O","U"]
         beg = 0
         end = len(str) - 1
 
