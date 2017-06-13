@@ -6,32 +6,50 @@ import sys
 def main():
     test = Solution()
 
-    a = TreeNode(10)
-    b = TreeNode(5)
-    c = TreeNode(-3)
-    d = TreeNode(3)
-    e = TreeNode(2)
-    f = TreeNode(11)
-    g = TreeNode(3)
-    h = TreeNode(-2)
-    i = TreeNode(1)
+    # a = TreeNode(10)
+    # b = TreeNode(5)
+    # c = TreeNode(-3)
+    # d = TreeNode(3)
+    # e = TreeNode(2)
+    # f = TreeNode(11)
+    # g = TreeNode(3)
+    # h = TreeNode(-2)
+    # i = TreeNode(1)
+    #
+    # a.left = b
+    # a.right = c
+    #
+    # b.left = d
+    # b.right = e
+    #
+    # c.right = f
+    #
+    # d.left = g
+    # d.right = h
+    #
+    # e.right = i
 
-    a.left = b
-    a.right = c
 
-    b.left = d
-    b.right = e
+    kb = Actor("Kevin Bacon")
+    a = Actor("a")
+    b = Actor("b")
+    c = Actor("c")
+    d = Actor("d")
+    e = Actor("e")
 
-    c.right = f
+    kb.add_actor(a)
 
-    d.left = g
-    d.right = h
+    a.add_actor(b)
+    a.add_actor(c)
 
-    e.right = i
+    b.add_actor(c)
+    b.add_actor(e)
 
-    test.print_tree(a)
-    print "****"
-    test.pre_order_NoRec(a)
+    c.add_actor(d)
+
+    d.add_actor(e)
+
+    test.sixBacon(kb, c)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -54,16 +72,175 @@ class TreeNode(object):
     def __str__(self):
         return str(self.val)
 
+    def __repr__(self):
+        return str(self.val)
+
+class Actor(object):
+    def __init__(self, name):
+        self.name = name
+        self.actors = set()
+        self.bacon = -1
+
+    def add_actor(self, actor):
+        self.actors.add(actor)
+        actor.actors.add(self)
+
+    def __repr__(self):
+        return self.name
+
 class Solution(object):
     def __init__(self):
         pass
 
-    def avg(self, nums):
+    def moving_avg(self, nums):
         """
         :param nums: Actualy a stream of data, but just put it into the list 
         :return: list[int]
         """
-        pass
+        
+
+    def sixBacon(self, kb, actor):
+        """
+        6 degrees of bacon game
+        :param kb: actor
+        :param actor: actor
+        :return: int
+        """
+        # can precompute bacon number O(n) for edges since expect n << m (nodes)
+        if not actor.actors:
+            print "No connections"
+            return 0
+
+        q = Queue.Queue()
+        q.put(actor)
+        while not q.empty():
+            curr_actor = q.get()
+            if curr_actor is kb:
+                print "FOUND HIM AT ", curr_actor.bacon
+                return curr_actor.bacon
+
+            print curr_actor, curr_actor.bacon, curr_actor.actors
+
+            for i in curr_actor.actors:
+                if i.bacon == -1:
+                    i.bacon = curr_actor.bacon + 1
+                    q.put(i)
+        return False
+
+
+    def tree_rotate_right(self, root):
+        """
+        Balance BST, more nodes in left than right
+        :param root: treenode
+        :return: treenode
+        """
+        # better to implement as method of TreeNode class O(1) since constant ops
+        if not root:
+            return
+        new_root = root.left
+        root.left = new_root.right
+        new_root.right = root
+        print new_root
+        return new_root
+
+    def unbalanced_bst(self, root):
+        """
+        Given unbalanced bst with more nodes in left than right, reorg to improve
+        balance but also keep as bst
+        :param root: treenode
+        :return: treenode
+        """
+        # Brute force way
+        arr = []
+        #     since bst can use inorder trav so just O(n)
+        self.unbalanced_bst_helper(root, arr)
+        print arr
+    #     convert to bst
+        res = self.unbalance_bst_helper_2(arr)
+        self.print_tree(res)
+
+    def unbalance_bst_helper_2(self, arr):
+        if not arr:
+            return None
+        beg = 0
+        end = len(arr) - 1
+        mid = (beg + end) / 2
+
+        root = arr[mid]
+        root.left = self. unbalance_bst_helper_2(arr[:mid])
+        root.right = self.unbalance_bst_helper_2(arr[mid+1:])
+
+        return root
+
+    def unbalanced_bst_helper(self, root, arr):
+        if not root:
+            return
+        self.unbalanced_bst_helper(root.left, arr)
+        arr.append(root)
+        self.unbalanced_bst_helper(root.right, arr)
+
+
+    def bt_to_heap(self, root):
+        """
+        Given set of int in unordered bin tree, us array sorting routine to 
+        turn tree into heap that uses balance binary tree as ds
+        :param nums: treenode
+        :return: treenode
+        """
+        arr = []
+        self.bt_to_heap_help(root, arr)
+
+        print arr
+
+        sort_arr = sorted(arr, key=self.sort_key)
+
+        print sort_arr
+
+        for i in range(len(sort_arr)):
+            left = 2*i + 1
+            right = left + 1
+
+            if left < len(sort_arr):
+                sort_arr[i].left = TreeNode(sort_arr[left])
+            if right < len(sort_arr):
+                sort_arr[i].right = TreeNode(sort_arr[right])
+            else:
+                sort_arr[i].left = None
+                sort_arr[i].right = None
+
+        for i in sort_arr:
+            print "NODE", i
+            print "l", i.left
+            print "r", i.right
+            print
+
+    def sort_key(self, treenode):
+        return treenode.val
+
+
+    def bt_to_heap_help(self, root, arr):
+        if not root:
+            return
+        arr.append(root)
+        self.bt_to_heap_help(root.left, arr)
+        self.bt_to_heap_help(root.right, arr)
+
+    def lca_bst(self, root, p, q):
+        """
+        find lowest common anc in bst
+        :param node1: treenode
+        :param node2: treenode
+        :return: treenode
+        """
+        if not root:
+            return
+        if root.right and root.val < min(p.val, q.val):
+            return self.lowestCommonAncestor(root.right, p, q)
+        elif root.left and root.val > max(p.val, q.val):
+            return self.lowestCommonAncestor(root.left, p, q)
+        else:
+            return root
+
 
     def pre_order_NoRec(self, root):
         """
@@ -101,15 +278,15 @@ class Solution(object):
     def in_order(self, root):
         if not root:
             return None
-        self.pre_order(root.left)
+        self.in_order(root.left)
         print root
-        self.pre_order(root.right)
+        self.in_order(root.right)
 
     def post_order(self, root):
         if not root:
             return None
-        self.pre_order(root.left)
-        self.pre_order(root.right)
+        self.post_order(root.left)
+        self.post_order(root.right)
         print root
 
 
@@ -222,18 +399,6 @@ class Solution(object):
 
         print ' '.join(res)
 
-
-    def pathSum(self, root, sum):
-        """
-        Each node has val, find number of paths that sum to given value
-        does not need to start or end at root or leaf but trav downwards
-        :param root: treenode
-        :param sum: int
-        :return: int
-        """
-
-
-        print "root", root
 
     def countSegments(self, s):
         """
