@@ -49,7 +49,7 @@ def main():
 
     d.add_actor(e)
 
-    test.sixBacon(kb, c)
+    test.moving_avg([0,1,2,3,4,5,9], 3)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -92,12 +92,133 @@ class Solution(object):
     def __init__(self):
         pass
 
-    def moving_avg(self, nums):
+    def moving_avg(self, l, N):
         """
+        feed or have a list of ints with block size return average of all block sizes
         :param nums: Actualy a stream of data, but just put it into the list 
         :return: list[int]
         """
-        
+        print l, N
+        sum = 0
+        result = list(0 for x in l)
+
+        for i in range(0, N):
+            sum = sum + l[i]
+            result[i] = sum / (i + 1)
+
+        print result, sum
+        # calculate the rest 
+        for i in range(N, len(l)):
+            sum = sum - l[i - N] + l[i]
+            result[i] = sum / N
+
+        print result
+        return result
+
+
+    def int_to_string(self, num):
+        stack = []
+
+        neg = ""
+        if num < 0:
+            num *= -1
+            neg = "-"
+
+        while num > 0:
+            right = num % 10
+
+            stack.append(chr(right + ord('0')))
+
+            num //= 10
+
+        res = ''.join(stack[::-1])
+        print type(res), res
+
+    def string_to_int(self, str_int):
+        if not str_int:
+            return
+
+        # deals with less operations
+        flag = 0
+        if str_int[0] == '-':
+            flag = 1
+        final = 0
+        for i in xrange(flag, len(str_int)):
+            final = final * 10 + (ord(str_int[i]) - ord('0'))
+        if flag == 1:
+            final *= -1
+        print final
+
+        print "** OR **"
+
+        # can also implement neg func
+        res = 0
+        i = 0
+        end = len(str_int) - 1
+        while end >= 0:
+            place = 10 ** i
+            res += (ord(str_int[end]) - 48) * place
+            end -= 1
+            i += 1
+        print res
+        print type(res)
+
+        # for i, j in enumerate(str_int):
+        #     hun = 10 ** i
+        #     res += int(i) * hun
+        # print res
+
+    # also dont use str
+    def reverse_better(self, str):
+        # try writing this quickly and correct errors as you go
+        if not str:
+            return ""
+
+        # change to arr prior to call so you wont have to convert each time
+        arr = self.reverse_inplace(str)
+        i = 0
+        # make sure this doesnt start at some spaces
+        while arr[i] == " ":
+            i += 1
+
+        for j in range(1, len(arr)):
+            if arr[j] == " ":
+                if arr[i] != " ":
+                    print self.reverse_inplace(arr[i:j])
+                    i = j + 1
+
+        if i != j:
+            print self.reverse_inplace(arr[i:j + 1])
+
+
+    def reverse_inplace(self, str):
+        # another way without too many python funcs
+        arr = list(str)
+    #     cannot use in place for python or java
+        for i in range(len(str)/2):
+            arr[i], arr[len(str) - 1 - i] = arr[len(str) - 1 - i], arr[i]
+        return arr
+
+
+    def remove_char(self, str, rmv):
+        """
+        remove specified chars in a word
+        :param str: str
+        :param rmv: str
+        :return: str
+        """
+        # uses O(n + m) space and runs O(n)
+        res = ""
+        nono = set(rmv)
+
+        print str
+        print nono
+
+        for i in str:
+            if i not in nono:
+                # actually much slower than just join
+                res += i
+        print res
 
     def sixBacon(self, kb, actor):
         """
