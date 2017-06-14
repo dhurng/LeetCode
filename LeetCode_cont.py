@@ -49,7 +49,7 @@ def main():
 
     d.add_actor(e)
 
-    test.moving_avg([0,1,2,3,4,5,9], 3)
+    print test.binary_search_rec([1,2,3,4,5], 2)
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -92,6 +92,45 @@ class Solution(object):
     def __init__(self):
         pass
 
+    def binary_search_rec(self, nums, trgt):
+        """
+        Binary Search on sorted array of int to find index of given int
+        :param nums: list[int] 
+        :param trgt: int
+        :return: int
+        """
+        if not nums or not trgt:
+            print "you fail"
+            return None
+        # check for any weird conditions, beg < end
+        # not in the list, not sorted list etc
+        beg = 0
+        end = len(nums) - 1
+        return self.binary_search_rec_helper(nums, beg, end, trgt)
+
+    def binary_search_rec_helper(self, nums, beg, end, trgt):
+        mid = (beg + end) / 2
+        if nums[mid] == trgt:
+            return mid
+        elif nums[mid] < trgt:
+            return self.binary_search_rec_helper(nums, mid + 1, end, trgt)
+        else:
+            return self.binary_search_rec_helper(nums, beg, mid - 1, trgt)
+
+
+    def factorial(self, n):
+        res = [0] * n
+        self.factorial_helper(n, res, 0)
+        print res
+        return res
+
+    def factorial_helper(self, n, res, level):
+        if n <= 1:
+            res[level] = 1
+            return 1
+        res[level] = n * self.factorial_helper(n - 1, res, level + 1)
+        return res
+
     def moving_avg(self, l, N):
         """
         feed or have a list of ints with block size return average of all block sizes
@@ -102,13 +141,15 @@ class Solution(object):
         sum = 0
         result = list(0 for x in l)
 
-        for i in range(0, N):
-            sum = sum + l[i]
+        for i in range(N):
+            sum += l[i]
             result[i] = sum / (i + 1)
 
         print result, sum
-        # calculate the rest 
+
+        # calculate the rest
         for i in range(N, len(l)):
+            print "s", sum, i, l[i -N], l[i]
             sum = sum - l[i - N] + l[i]
             result[i] = sum / N
 
@@ -198,7 +239,6 @@ class Solution(object):
         for i in range(len(str)/2):
             arr[i], arr[len(str) - 1 - i] = arr[len(str) - 1 - i], arr[i]
         return arr
-
 
     def remove_char(self, str, rmv):
         """
@@ -1236,8 +1276,11 @@ class Solution(object):
         :param node: listnode
         :return: none, modify in place
         """
-        node.val = node.next.val
-        node.next = node.next.next
+        if node.next:
+            node.val = node.next.val
+            node.next = node.next.next
+        else:
+            print "Cannot delete the last node!"
 
     def lowestCommonAncestor(self, root, p, q):
         """
