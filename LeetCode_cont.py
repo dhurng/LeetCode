@@ -49,7 +49,7 @@ def main():
 
     d.add_actor(e)
 
-    print test.binary_search_rec([1,2,3,4,5], 2)
+    test.longest_sub_distinct("abdeeeedca")
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -91,6 +91,144 @@ class Actor(object):
 class Solution(object):
     def __init__(self):
         pass
+
+
+    def remove_duplicates(self, nums):
+        """
+        should do this in place
+        :param nums: list[int]
+        :return: int
+        """
+        if not nums:
+            return 0
+        curr = 0
+        for i in range(1, len(nums)):
+            if nums[curr] == nums[i]:
+                curr += 1
+                nums[curr] = nums[i]
+        return curr + 1
+
+
+    def free_time(self, sorted_list):
+    #   sorted_list = sorted(list_of_people)
+    #   [[9,11], [9,12], [12.5,13.5], [13,14], [17, 24]]
+    #   res = [0, 9] [12, 12.5], [14,17]
+        start = 0
+        res = []
+        for time in sorted_list:
+            beg = time[0]
+            end = time[1]
+            if start > beg and start < end:
+                start = end
+            elif start != beg:
+                res.append([start, beg])
+                start = end
+
+        if end != 24:
+            res.append([start, 24])
+
+        print res
+        return res
+
+    def longest_sub_distinct(self, word):
+        """
+        find the longest substring with the number of distinct letters
+        :param word: str
+        :param size: int
+        :return: int
+        """
+        if not word:
+            return 0
+        print word
+
+        dis = set()
+        longest = 0
+        curr = 0
+        for i in word:
+            if i not in dis:
+                if len(dis) == 2:
+                    dis.clear()
+
+                    if curr > longest:
+                        longest = curr
+                    curr = 1
+                dis.add(i)
+
+            if i in dis:
+                curr += 1
+            if curr > longest:
+                longest = curr
+        print longest
+        return longest
+
+
+    def rpn_calc(self, ops):
+        """
+        create simple rpn calculator/polish calc
+        :param ops: str
+        :return: int
+        """
+        if not ops:
+            return 0
+        ops = ops.split(' ')
+        print ops
+        stack = []
+        operations = ['-', '+', '*', '/']
+        for val in ops:
+            if val in operations and len(stack) != 0:
+                op1 = stack.pop()
+                op2 = stack.pop()
+                if val == '-':
+                    res = op2 - op1
+                if val == '+':
+                    res = op2 + op1
+                if val == '*':
+                    res = op2 * op1
+                if val == '/':
+                    res = op2 / op1
+                stack.append(res)
+            else:
+                stack.append(float(val))
+        print stack.pop()
+        # return stack.pop()
+
+    def combination_of_string(self, c_str):
+        """
+        Find all combinations of a string recursively
+        :param c_str: str
+        :return: list[str]
+        """
+        if len(c_str) < 2:
+            return [c_str]
+        res = []
+        for i, c in enumerate(c_str):
+            print c_str[:i] + c_str[i + 1:]
+            for r in self.combination_of_string(c_str[:i] + c_str[i + 1:]):
+                res.append([c])
+        return res
+
+    def permutations_of_string(self, p_str):
+        """
+        Print all permutations of a string recursively
+        :param orig_str: str
+        :return: list[str]
+        """
+        # base case single letter
+        if len(p_str) < 2:
+            return p_str
+
+        # remove head
+        perms = self.permutations_of_string(p_str[1:])
+        head = p_str[0]
+        res = []
+
+        for perm in perms:
+            for i in range(len(perm) + 1):
+                # put head in every location
+                res.append(perm[:i] + head + perm[i:])
+        print res
+        return res
+
 
     def binary_search_rec(self, nums, trgt):
         """
