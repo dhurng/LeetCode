@@ -6,50 +6,15 @@ import sys
 def main():
     test = Solution()
 
-    # a = TreeNode(10)
-    # b = TreeNode(5)
-    # c = TreeNode(-3)
-    # d = TreeNode(3)
-    # e = TreeNode(2)
-    # f = TreeNode(11)
-    # g = TreeNode(3)
-    # h = TreeNode(-2)
-    # i = TreeNode(1)
-    #
-    # a.left = b
-    # a.right = c
-    #
-    # b.left = d
-    # b.right = e
-    #
-    # c.right = f
-    #
-    # d.left = g
-    # d.right = h
-    #
-    # e.right = i
+    # grid = [[0 for i in range(6)] for j in range(4)]
+    # grid[1][2] = 'x'
+    # grid[1][3] = 'x'
+    # grid[2][4] = 'x'
+    # grid[3][5] = 'x'
+    # test.count_island(grid)
 
+    print test.one_away("plle", "pale")
 
-    kb = Actor("Kevin Bacon")
-    a = Actor("a")
-    b = Actor("b")
-    c = Actor("c")
-    d = Actor("d")
-    e = Actor("e")
-
-    kb.add_actor(a)
-
-    a.add_actor(b)
-    a.add_actor(c)
-
-    b.add_actor(c)
-    b.add_actor(e)
-
-    c.add_actor(d)
-
-    d.add_actor(e)
-
-    test.longest_sub_distinct("abdeeeedca")
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -90,7 +55,245 @@ class Actor(object):
 
 class Solution(object):
     def __init__(self):
-        pass
+        self._largest = -sys.maxint
+
+    def one_away(self, str1, str2):
+        """
+        see if 2 strings are either insert, delete, or replace away
+        :param str1: str
+        :param str2: str
+        :return: bool
+        """
+        if len(str1) > len(str2):
+            long = str1
+            short = str2
+        else:
+            long = str2
+            short = str1
+        print long, short
+
+        if len(long) - len(short) > 1:
+            return False
+        map = dict()
+        for i in short:
+            if i not in map:
+                map[i] = 1
+            else:
+                map[i] += 1
+        print map
+
+        diff = 0
+        for j in long:
+            if j not in map:
+                diff += 1
+            else:
+                map[j] -= 1
+        print diff
+
+        if -1 in map.values():
+            return False
+
+        if diff > 1:
+            return False
+
+        return True
+
+
+
+    def palindrome_permu(self, str):
+        """
+        given string check if permutation of palindrome
+        :param str: str
+        :return: bool
+        """
+        if not str:
+            return True
+        str = str.lower()
+        str = ''.join(str.split())
+
+        map = dict()
+        for i in str:
+            if i not in map:
+                map[i] = 1
+            else:
+                map[i] += 1
+        print map
+
+        odd_count = 0
+        for j in map.values():
+            if j % 2 != 0:
+                odd_count += 1
+        if odd_count > 1:
+            return False
+
+        print "it is"
+        return True
+
+    def find_deepest_node(self, root):
+        """
+        find deepest node in bst using bfs 
+        :param root: treenode
+        :return: treenode
+        """
+        if not root:
+            return
+        res = []
+        q = Queue.Queue()
+        q.put(root)
+        while not q.empty():
+            curr = q.get()
+            res.append(curr)
+            if curr.left:
+                q.put(curr.left)
+            if curr.right:
+                q.put(curr.right)
+        return res[-1]
+
+    def count_island(self, grid):
+        """
+        count number of islands
+        :param grid: 
+        :return: 
+        """
+        print grid
+        print "*****"
+
+        if not grid:
+            return 0
+
+        row = len(grid)
+        col = len(grid[0])
+
+        count = 0
+
+        for i in xrange(row):
+            for j in xrange(col):
+                if grid[i][j] == 'x':
+                    # counting number of islands not the number of x's
+                    self.visit_island(i, j, grid)
+                    count += 1
+        print count
+        return count
+
+    def visit_island(self, row, col, grid):
+        # verify it is island and check its neighbors
+        if row >= 0 and row < len(grid) and col >= 0 and col < len(grid[0]) and grid[row][col] == 'x':
+            # marked all connected islands visited
+            grid[row][col] = 'm'
+            self.visit_island(row + 1, col, grid)
+            self.visit_island(row - 1, col, grid)
+            self.visit_island(row, col + 1, grid)
+            self.visit_island(row, col - 1, grid)
+
+    def is_valid_bst(self, root):
+        """
+        validate bst
+        :param root: treenode 
+        :return: bool
+        """
+        min = float('-inf')
+        max = float('inf')
+        return self.is_valid_bst_helper(root, min, max)
+
+    def is_valid_bst_helper(self, root, min, max):
+        if not root:
+            return True
+        if root.val <= min or root.val >= max:
+            return False
+        return self.is_valid_bst_helper(root.left, min, root.val) and self.is_valid_bst_helper(root.right, root.val, max)
+
+    def merge_sort(self, nums):
+        """
+        merge sort 
+        :param nums: list[int]
+        :return: list[int]
+        """
+        if len(nums) < 2:
+            return nums
+        mid = len(nums) // 2
+        left = nums[:mid]
+        right = nums[mid:]
+
+        self.merge_sort(left)
+        self.merge_sort(right)
+
+        i, j, k = 0, 0, 0
+
+        while i < len(left) and j < len(right):
+            if left[i] < right[j]:
+                nums[k] = left[i]
+                i += 1
+            else:
+                nums[k] = right[j]
+                j += 1
+            k += 1
+
+        while i < len(left):
+            nums[k] = left[i]
+            i += 1
+            k += 1
+
+        while j < len(right):
+            nums[k] = right[j]
+            j += 1
+            k += 1
+
+        print "merging ", nums
+
+
+    def needle_haystack(self, needle, haystack):
+        """
+        needle in haystack question, index of match
+        :param needle: str
+        :param haystack: str
+        :return: int 
+        """
+        if needle == "":
+            return 0
+        for i in range(len(haystack) - len(needle) + 1):
+            for j in range(len(needle)):
+                if haystack[i + j] != needle[j]:
+                    break
+                if j == len(needle) - 1:
+                    return i
+        return -1
+
+    def print_reverse(self, nums):
+        rev = nums[::-1]
+        print rev
+        res = ""
+        for i in rev:
+            res += str(i) + " "
+        print res
+
+    def lonely(self, nums):
+        """
+        find lonely number when all others are in pairs
+        :param nums: list[int]
+        :return: int
+        """
+        # bit manipulation way
+        res = 0
+        for i in nums:
+            res ^= i
+        print res
+
+
+        # if not nums:
+        #     return
+        # # use dict way
+        # map = dict()
+        # for i in nums:
+        #     if i not in map:
+        #         map[i] = 1
+        #     else:
+        #         map[i] += 1
+        # print map
+        #
+        # for key,val in map.iteritems():
+        #     if val == 1:
+        #         print "lonely: ", key
+        #         return key
 
 
     def remove_duplicates(self, nums):
@@ -217,7 +420,7 @@ class Solution(object):
         if len(p_str) < 2:
             return p_str
 
-        # remove head
+        # remove head like part of merge sort recursive part
         perms = self.permutations_of_string(p_str[1:])
         head = p_str[0]
         res = []
