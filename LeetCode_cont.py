@@ -6,14 +6,15 @@ import sys
 def main():
     test = Solution()
 
-    # grid = [[0 for i in range(6)] for j in range(4)]
+    # grid = [[0 for i in range(4)] for j in range(4)]
+    grid = [[0,1,2,3],
+            [4,5,6,7],
+            [8,9,10,11]]
     # grid[1][2] = 'x'
     # grid[1][3] = 'x'
     # grid[2][4] = 'x'
     # grid[3][5] = 'x'
-    # test.count_island(grid)
-
-    print test.one_away("plle", "pale")
+    print test.is_rotiational("waterbottle", "erbottlewat")
 
 
 # Definition for singly-linked list.
@@ -57,6 +58,140 @@ class Solution(object):
     def __init__(self):
         self._largest = -sys.maxint
 
+    def is_rotiational(self, str1, str2):
+        """
+        Use substring method/needle in haystack given 2 strings, check if s2
+        is rotation of s1 using only 1 call
+        :param input_str: str
+        :return: bool
+        """
+        if not str1 and not str2:
+            return True
+        if not str1 or not str2:
+            return False
+    #     append itself twice to see and use a list vs concat
+        total = []
+        for i in str2:
+            total.append(i)
+        for i in str2:
+            total.append(i)
+        total = ''.join(total)
+
+        # check below, only returns the position but if its not -1 its true
+        pos = self.needle_haystack(str1, total)
+        return True if pos != -1 else False
+
+
+
+    def zero_matrix(self, grid):
+        """
+        if element in mxn matrix is 0, then entire row and column are 0
+        :param grid: list[list[int]]
+        :return: list[list[int]]
+        """
+        print grid
+    #     since we cannot just look for a 0 and set it due to conflict and everything would be set to 0
+    #     keep track of row and column
+        row = len(grid)
+        col = len(grid[0])
+        #     use 2 arrays to keep track of rows/cols with 0
+        arr1 = [False] * row
+        arr2 = [False] * col
+
+        for r in xrange(row):
+            for c in xrange(col):
+                if grid[r][c] == 0:
+                    print "found you at ", r, c
+                    arr1[r] = True
+                    arr2[c] = True
+        print arr1, arr2
+
+        for i in range(len(arr1)):
+            if arr1[i]:
+                self.null_row(grid, i)
+
+        for j in range(len(arr2)):
+            if arr2[j]:
+                self.null_col(grid, j)
+
+        print grid
+
+    def null_row(self, grid, row):
+        for j in range(len(grid[0])):
+            grid[row][j] = 0
+
+    def null_col(self, grid, col):
+        for i in range(len(grid)):
+            grid[i][col] = 0
+
+
+    def rotate_matrix(self, grid):
+        """
+        rotate a matrix by 90 degrees
+        :param grid: list[list[int]]
+        :return: list[list[int]]
+        """
+        print grid
+        if len(grid) == 0 or len(grid) != len(grid[0]):
+            print "no bueno"
+            return False
+
+        n = len(grid)
+        for layer in range(n/2):
+            # go from first section of layer to the end
+            for i in range(layer, n - 1 - layer, 1):
+                grid[layer][i], grid[n - 1 - i][layer], grid[i][n - 1 - layer], \
+                grid[n - 1 - layer][n - 1 - i] = grid[n - 1 - i][layer], \
+                grid[n - 1 - layer][n - 1 - i], grid[layer][i], grid[i][n - 1 - layer]
+        print grid
+        return grid
+
+    def strstr(self, str1, str2):
+        """
+        implement substring runtime is O(ab)
+        :param str1: str
+        :param str2: str
+        :return: int
+        """
+        if not str1 or not isinstance(str1, str):
+            return False
+        if not str2 or not isinstance(str2, str):
+            return False
+
+        for i in xrange(len(str1) - len(str2) + 1):
+            if str1[i:i + len(str2)] == str2:
+                return i
+        return -1
+
+    def str_compression(self, input_str):
+        """
+        compress string to have count follow it
+        :param str: str
+        :return: str
+        """
+        if not input_str:
+            return ""
+        counter = 1
+        res = []
+        i = 0
+        for j in range(1, len(input_str)):
+            if input_str[i] != input_str[j]:
+                res.append(input_str[i])
+                res.append(str(counter))
+                counter = 1
+                i = j
+            else:
+                counter += 1
+        res.append(input_str[i])
+        res.append(str(counter))
+
+        res = ''.join(res)
+
+        if len(res) > len(input_str):
+            return input_str
+        return res
+
+
     def one_away(self, str1, str2):
         """
         see if 2 strings are either insert, delete, or replace away
@@ -64,40 +199,69 @@ class Solution(object):
         :param str2: str
         :return: bool
         """
-        if len(str1) > len(str2):
-            long = str1
-            short = str2
-        else:
-            long = str2
-            short = str1
-        print long, short
-
-        if len(long) - len(short) > 1:
+        if str1 == str2:
+            return True
+        if abs(len(str1) - str(str2)) > 1:
             return False
-        map = dict()
-        for i in short:
-            if i not in map:
-                map[i] = 1
+        count = 0
+        i, j = 0, 0
+        while i < str1 and j < str2:
+            if str1[i] != str2[j]:
+                if count == 1:
+                    return False
+
+                if len(str1) > len(str2):
+                    i += 1
+                elif len(str1) < len(str2):
+                    j += 1
+                else:
+                    i += 1
+                    j += 1
+                count += 1
             else:
-                map[i] += 1
-        print map
+                i += 1
+                j += 1
 
-        diff = 0
-        for j in long:
-            if j not in map:
-                diff += 1
-            else:
-                map[j] -= 1
-        print diff
+        if i < str1 and j < str2:
+            count += 1
 
-        if -1 in map.values():
-            return False
+        return count == 1
 
-        if diff > 1:
-            return False
-
-        return True
-
+        # or
+        # uses extra map space
+        # if len(str1) > len(str2):
+        #     long = str1
+        #     short = str2
+        # else:
+        #     long = str2
+        #     short = str1
+        # print long, short
+        #
+        # if len(long) - len(short) > 1:
+        #     return False
+        # map = dict()
+        # for i in short:
+        #     if i not in map:
+        #         map[i] = 1
+        #     else:
+        #         map[i] += 1
+        # print map
+        #
+        # diff = 0
+        # for j in long:
+        #     if j not in map:
+        #         diff += 1
+        #     else:
+        #         map[j] -= 1
+        # print diff
+        #
+        # if -1 in map.values():
+        #     return False
+        #
+        # if diff > 1:
+        #     return False
+        #
+        # return True
 
 
     def palindrome_permu(self, str):
