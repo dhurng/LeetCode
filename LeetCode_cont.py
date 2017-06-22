@@ -14,8 +14,7 @@ def main():
     # grid[1][3] = 'x'
     # grid[2][4] = 'x'
     # grid[3][5] = 'x'
-    print test.is_rotiational("waterbottle", "erbottlewat")
-
+    # print test.is_rotiational("waterbottle", "erbottlewat")
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -470,11 +469,10 @@ class Solution(object):
             return 0
         curr = 0
         for i in range(1, len(nums)):
-            if nums[curr] == nums[i]:
+            if nums[curr] != nums[i]:
                 curr += 1
                 nums[curr] = nums[i]
-        return curr + 1
-
+        return nums[:curr + 1]
 
     def free_time(self, sorted_list):
     #   sorted_list = sorted(list_of_people)
@@ -1187,6 +1185,7 @@ class Solution(object):
         """
         res = []
         for i in range(1, n + 1):
+            # or just i % 15
             if i % 3 == 0 and i % 5 == 0:
                 print "FizzBuzz"
                 res.append("FizzBuzz")
