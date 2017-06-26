@@ -2,20 +2,26 @@ import sys
 def main():
     test = Solution()
 
-    a = ListNode("a")
-    b = ListNode("b")
-    c = ListNode("c")
-    d = ListNode("d")
-    e = ListNode("e")
-    f = ListNode("f")
+    an = AnimalShelter()
+    a = AnimalNode("dog", "a")
+    b = AnimalNode("dog", "b")
+    c = AnimalNode("dog", "c")
 
-    a.next = b
-    b.next = c
-    c.next = d
-    d.next = e
-    e.next = c
+    d = AnimalNode("cat", "d")
+    e = AnimalNode("cat", "e")
 
-    test.loop_detection(a)
+    an.enq(a)
+    an.enq(d)
+    an.enq(b)
+    an.enq(c)
+    an.enq(e)
+
+    an.dq()
+
+    print "******"
+    an.printer(a)
+    print "**"
+    an.printer(d)
 
 class ListNode(object):
     def __init__(self, data, next=None):
@@ -342,6 +348,221 @@ class Solution(object):
         while node:
             print node
             node = node.next
+
+class StackPlates(object):
+    """
+    implement a stack that has threshold 
+    """
+    def __init__(self):
+        # 0 index
+        self.threshold = 1
+        self.curr_stack = 0
+        self.stacks = [[]]
+
+    def push(self, item):
+        if len(self.stacks[self.curr_stack]) > self.threshold:
+            new_stack = []
+            self.stacks.append(new_stack)
+            self.curr_stack += 1
+        self.stacks[self.curr_stack].append(item)
+
+    def pop(self):
+        # what if keep popping and the curr stack is empty?
+        if len(self.stacks[self.curr_stack]) != 0:
+            if len(self.stacks[self.curr_stack]) == 1:
+                del self.stacks[self.curr_stack]
+                self.curr_stack -= 1
+            return self.stacks[self.curr_stack].pop()
+        else:
+            del self.stacks[self.curr_stack]
+            self.curr_stack -= 1
+            return self.stacks[self.curr_stack].pop()
+
+    def pop_at(self, index):
+        # shouldnt be empty
+        if len(self.stacks) != 0:
+    #         0 index
+            if index > len(self.stacks) or index < 0:
+                print "out of bounds index"
+                return False
+            else:
+                # can add a condition to check the entire stack
+                return self.stacks[index].pop()
+
+    def peek(self):
+        if len(self.stacks[self.curr_stack]) != 0:
+            return self.stacks[self.curr_stack][-1]
+        print "empty!"
+
+    def empty(self):
+        return True if len(self.stacks[self.curr_stack]) == 0 else False
+
+class MinStack(object):
+    """
+    implement min stack all ops are constant
+    or use another stack to keep min
+    """
+    def __init__(self):
+        self.curr_min = sys.maxint
+        self.stack = []
+
+    def push(self, item):
+        self.curr_min = min(self.curr_min, item)
+        item = (item, self.curr_min)
+        self.stack.append(item)
+
+    def pop(self):
+        if len(self.stack) != 0:
+            return self.stack.pop()
+
+    def peek(self):
+        if len(self.stack) != 0:
+            return self.stack[-1]
+
+    def min(self):
+        if len(self.stack) != 0:
+            latest = self.stack[-1]
+            return latest[1]
+
+    def empty(self):
+        return True if len(self.stack) == 0 else False
+
+    def print_s(self):
+        print self.stack
+
+class MyQueue(object):
+    """
+    implement a q using 2 stacks
+    """
+    def __init__(self):
+        self.s1 = []
+        self.s2 = []
+
+    def get(self):
+        while self.s1:
+            self.s2.append(self.s1.pop())
+        if len(self.s2) != 0:
+            res = self.s2.pop()
+            self.s1, self.s2 = self.s2, self.s1
+            return res
+        print "empty"
+
+    def put(self, item):
+        self.s1.append(item)
+
+    def empty(self):
+        return True if len(self.s1) == 0 else False
+
+class SortStack(object):
+    """
+    have a sorted stack
+    """
+    def __init__(self):
+        self.stack = []
+        self.temp_stack = []
+
+    def push(self, item):
+        if len(self.stack) == 0:
+            self.stack.append(item)
+
+        elif self.stack[-1] < item:
+            while self.stack and self.stack[-1] < item:
+                self.temp_stack.append(self.stack.pop())
+            self.stack.append(item)
+
+            while self.temp_stack:
+                self.stack.append(self.temp_stack.pop())
+        else:
+            self.stack.append(item)
+
+    def pop(self):
+        return self.stack.pop()
+
+    def peek(self):
+        return self.stack[-1]
+
+    def empty(self):
+        return True if len(self.stack) == 0 else False
+
+class AnimalNode(object):
+    def __init__(self, type, name=None, order=-1, next=None):
+        self.type = type
+        self.name = name
+        self.next = next
+        self.order = order
+
+    def __repr__(self):
+        return self.type + " : " + self.name + " : " + str(self.order)
+
+class AnimalShelter(object):
+    """
+    fifo, oldest of both dogs and cats or one of each
+    
+    did this as a stack to return most recent for q
+    just return and remove the head
+    
+    for the dq then also search for the counter that is 0
+    """
+    def __init__(self):
+        self.dog_q = ListNode("dog_dummy")
+        self.cat_q = ListNode("cat_dummy")
+
+        self.head_dog_slow = self.dog_q
+        self.head_cat_slow = self.cat_q
+
+        self.head_dog = self.dog_q
+        self.head_cat = self.cat_q
+        self.counter = 0
+
+    def enq(self, animal):
+        if animal.type == "dog":
+            animal.order = self.counter
+            self.counter += 1
+
+            self.dog_q.next = animal
+            self.dog_q = self.dog_q.next
+
+        if animal.type == "cat":
+            animal.order = self.counter
+            self.counter += 1
+
+            self.cat_q.next = animal
+            self.cat_q = self.cat_q.next
+
+    def dq(self):
+        if self.cat_q.order == (self.counter - 1):
+            print "Cat"
+            self.dq_cat()
+        if self.dog_q.order == (self.counter - 1):
+            print "Dog"
+            self.dq_dog()
+
+    def dq_dog(self):
+        if self.dog_q:
+            while self.head_dog.next.next:
+                self.head_dog = self.head_dog.next
+
+            print self.head_dog.next
+            self.head_dog.next = None
+            self.head_dog = self.head_dog_slow
+        else:
+            print "empty"
+
+    def dq_cat(self):
+        if self.cat_q:
+            while self.head_cat.next.next:
+                self.head_cat = self.head_cat.next
+
+            print self.head_cat.next
+            self.head_cat.next = None
+            self.head_cat = self.head_cat_slow
+        else:
+            print "empty"
+
+    def printer(self, animal):
+        while animal:
+            print animal
+            animal = animal.next
 
 if __name__ == '__main__':
     main()

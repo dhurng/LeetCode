@@ -14,7 +14,6 @@ def main():
     # grid[1][3] = 'x'
     # grid[2][4] = 'x'
     # grid[3][5] = 'x'
-    # print test.is_rotiational("waterbottle", "erbottlewat")
 
 # Definition for singly-linked list.
 class ListNode(object):
@@ -79,8 +78,6 @@ class Solution(object):
         # check below, only returns the position but if its not -1 its true
         pos = self.needle_haystack(str1, total)
         return True if pos != -1 else False
-
-
 
     def zero_matrix(self, grid):
         """
