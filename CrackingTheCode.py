@@ -1,27 +1,50 @@
 import sys
+import Queue
+
 def main():
     test = Solution()
 
-    an = AnimalShelter()
-    a = AnimalNode("dog", "a")
-    b = AnimalNode("dog", "b")
-    c = AnimalNode("dog", "c")
+    # graph = {0: [1],
+    #         1: [2],
+    #         2: [3],
+    #         3: [],
+    #         4: [6],
+    #         5: [4],
+    #         6: [5]}
+    # test.route_graph(graph, 1, 3)
 
-    d = AnimalNode("cat", "d")
-    e = AnimalNode("cat", "e")
+    # a = Project("a", 1)
+    # b = Project("b", 1)
+    # c = Project("c", 1)
+    # d = Project("d", 2)
+    # e = Project("e", 0)
+    # f = Project("f", 0)
+    #
+    # a.add(d)
+    # f.add(b)
+    # f.add(a)
+    # b.add(d)
+    # d.add(c)
 
-    an.enq(a)
-    an.enq(d)
-    an.enq(b)
-    an.enq(c)
-    an.enq(e)
+    a = TreeNode(4)
+    b = TreeNode(2)
+    c = TreeNode(6)
+    d = TreeNode(1)
+    e = TreeNode(3)
+    f = TreeNode(5)
 
-    an.dq()
+    a.left = b
+    a.right = c
 
-    print "******"
-    an.printer(a)
-    print "**"
-    an.printer(d)
+    b.left = d
+    b.right = e
+
+    c.left = f
+
+    res = []
+    test.root_leaf_sum(a, 9, res)
+    print res
+
 
 class ListNode(object):
     def __init__(self, data, next=None):
@@ -31,9 +54,416 @@ class ListNode(object):
     def __repr__(self):
         return str(self.data)
 
+
+class TreeNode(object):
+    def __init__(self, data, left=None, right=None):
+        self.data = data
+        self.left = left
+        self.right = right
+        self.size = 0
+
+    def __repr__(self):
+        return str(self.data)
+
+class GraphNode(object):
+    def __init__(self, data):
+        self.data = data
+        self.children = []
+
+    def __repr__(self):
+        return str(self.data)
+
+class Project(object):
+    # quickly giving it values
+    def __init__(self, data, in_count):
+        self.data = data
+        self.out = []
+        self.in_count = in_count
+
+    def add(self, project):
+        self.out.append(project)
+
+    def __repr__(self):
+        return self.data
+
 class Solution(object):
     def __init__(self):
         pass
+
+    def paths_sum(self, root, sum):
+        """
+        find paths that add to sum, do not need root to leaf
+        :param root: treenode
+        :param sum: int
+        :return: list[treenode]
+        """
+        if not root:
+            return []
+        my_map = dict()
+        self.paths_sum_helper(root, sum, 0, my_map)
+
+    def paths_sum_helper(self, root, sum, curr_sum, my_map):
+        if not root:
+            return 0
+
+    #     count paths with sum at curr
+        curr_sum += root.data
+        sum = curr_sum - sum
+        total = my_map.get(sum)
+
+    #     if curr_sum == trgt sum then 1 path starts at root
+        if curr_sum == sum:
+            total += 1
+
+        self.incrtable(my_map, curr_sum, 1)
+        total += self.paths_sum_helper(root.left, sum, curr_sum, my_map)
+        total += self.paths_sum_helper(root.right, sum, curr_sum, my_map)
+        self.incrtable(my_map, curr_sum, -1)
+
+        return total
+
+    def incrtable(self, my_map, key, diff):
+        new = my_map.get(key) + diff
+        if new == 0:
+            del my_map[key]
+        else:
+            my_map[key] = new
+
+    def root_leaf_sum(self, root, sum, res):
+        if not root:
+            return False
+        if not root.left and not root.right:
+            if root.data == sum:
+                res.append(root)
+                return True
+            else:
+                return False
+        # if its true, it adds itself into back of list
+        if self.root_leaf_sum(root.left, sum - root.data, res):
+            res.append(root.data)
+            return True
+        if self.root_leaf_sum(root.right, sum - root.data, res):
+            res.append(root.data)
+            return True
+        return False
+
+    def find_node(self, root, trgt):
+        if not root:
+            return
+        print root
+        if root is trgt:
+            print "found"
+            return root
+        return self.find_node(root.left, trgt) or self.find_node(root.right, trgt)
+
+    def check_subtree(self, n1, n2):
+        """
+        check if t2 is subtree of large n1
+        :param n1: treenode
+        :param n2: treenode
+        :return: bool
+        """
+        res = self.search2(n1, n2)
+        print "res", res
+        # if res:
+        #     nice = self.is_iden(res, n2)
+        # print nice
+        return res
+
+    def is_iden(self, n1, n2):
+        if not n1 and not n2:
+            return True
+        if not n1 or not n2:
+            return False
+        if n1 is not n2:
+            return False
+        if self.is_iden(n1.left, n2.left) and self.is_iden(n1.right, n2.right):
+            return True
+
+    def search2(self, root, root2):
+        if not root:
+            return False
+
+        if root is root2 and self.is_iden(root, root2):
+            return True
+        # dfs way
+        else:
+            return self.search2(root.left, root2) or self.search2(root.right, root2)
+
+        # q = Queue.Queue()
+        # q.put(root)
+        #
+        # while not q.empty():
+        #     popped = q.get()
+        #     print popped
+        #     if popped is root2:
+        #         return popped
+        #
+        #     if popped.left:
+        #         q.put(popped.left)
+        #     if popped.right:
+        #         q.put(popped.right)
+
+    def print_null(self, root, res):
+        if not root:
+            res.append(root)
+            return
+        res.append(root)
+        self.print_null(root.left, res)
+        self.print_null(root.right, res)
+
+    def first_ca(self, root, n1, n2):
+        """
+        Find first common ancestor of 2 nodes in binary tree not bst
+        :param root: treenode
+        :param n1, n2: treenodes
+        :return: treenode
+        """
+        if not root:
+            return
+        # includes if it is both
+        if root is n1 or root is n2:
+            return root
+        left = self.first_ca(root.left, n1, n2)
+        right = self.first_ca(root.right, n1, n2)
+        if left and right:
+            return root
+        if not left and not right:
+            return
+        return left if left else right
+
+
+    def build_order(self, projects):
+        """
+        given lists of projects and dependencies, find the build order
+        will just use unique strings to rep projects
+        :param projects: list[str]
+        :param depend: list[tuples(str,str)]
+        :return: list[str]
+        """
+        print projects
+        res = []
+        for i in projects:
+            if i.in_count == 0:
+                res.append(i)
+        print "res", res
+        i = 0
+        while i < len(res):
+            curr = res[i]
+            print curr
+            if not curr:
+                return None
+            for j in curr.out:
+                j.in_count -= 1
+                # because we know that before is already 0 just cont loop
+                if j.in_count == 0:
+                    res.append(j)
+            i += 1
+        print res
+        # runs O(d + p) p for proj, d for pair of dep
+        return res
+
+    def successor(self, root):
+        """
+        find the next node, in-order successor) of given node in bst
+        assume each node has link to parent
+        :param root: treenode
+        :return: treenode
+        """
+    #     if there is right sub then return leftmost child
+    #   else if node is right child keep going up
+    #   either way return the parent
+        if not root:
+            return
+        if root.right:
+            return self.left_most(root.right)
+        else:
+            q = root
+            # reference to parent
+            x = q.parent
+            while x and x.left is not q:
+                q = x
+                x = x.parent
+            return x
+
+    def left_most(self, root):
+        if not root:
+            return
+        while root.left:
+            root = root.left
+        print root
+        return root
+
+    def copy_bst(self, root, arr):
+        if not root:
+            return
+        self.copy_bst(root.left, arr)
+        arr.append(root)
+        self.copy_bst(root.right, arr)
+
+    def validate_bst(self, root):
+        """
+        check if binary tree is bst
+        :param root: treenode
+        :return: bool
+        """
+        min = -sys.maxint
+        max = sys.maxint
+        return self.validate_bst_helper(root, min, max)
+
+    def validate_bst_helper(self, root, min, max):
+        if not root:
+            return True
+        if root.data <= min or root.data >= max:
+            return False
+        left = self.validate_bst_helper(root.left, min, root.data)
+        right = self.validate_bst_helper(root.right, root.data, max)
+        if left and right:
+            return True
+        return False
+
+    def check_balanced(self, root):
+        """
+        check if binary tree is balanced
+        :param root: 
+        :return: 
+        """
+        # if not root:
+        #     return True
+        # diff = abs(self.find_height(root.left) - self.find_height(root.right))
+        # return True if diff < 2 and self.check_balanced(root.left) and self.check_balanced(root.right) else False
+
+        # fast fail method with O(n) and O(h) for height
+        return True if self.find_height(root) != -sys.maxint else False
+
+    def find_height(self, root):
+        if not root:
+            return 0
+
+        left = self.find_height(root.left)
+        if left == -sys.maxint:
+            return -sys.maxint
+
+        right = self.find_height(root.right)
+        if right == -sys.maxint:
+            return -sys.maxint
+
+        diff = abs(right - left)
+        if diff > 1:
+            return -sys.maxint
+        else:
+            return max(self.find_height(root.left), self.find_height(root.right)) + 1
+
+    def list_of_depths(self, root):
+        """
+        Given binary tree, create an ll of all nodes at each depth
+        depth d so d linked lists
+        :param root: treenode
+        :return: linklist
+        """
+        # used preorder
+        lists = []
+        self.list_of_depths_helper(root, lists, 0)
+
+        for i in lists:
+            while i:
+                print i
+                i = i.next
+            print " "
+        return lists
+
+    def list_of_depths_helper(self, node, lists, level):
+        if not node:
+            return
+        if len(lists) == level:
+            # dummy
+            list = ListNode(-sys.maxint)
+            lists.append(list)
+        else:
+            list = lists[level]
+        #     add to the end
+        while list.next:
+            list = list.next
+        list.next = ListNode(node.data)
+        self.list_of_depths_helper(node.left, lists, level + 1)
+        self.list_of_depths_helper(node.right, lists, level + 1)
+
+    def min_tree(self, nums):
+        """
+        Given sorted unique int arr, create bst with minimal height
+        :param nums: list[int]
+        :return: treenode
+        """
+    #   just use the mid as root and break it apart
+        if not nums:
+            return None
+        beg = 0
+        end = len(nums) - 1
+        mid = (beg + end) / 2
+
+        root = TreeNode(nums[mid])
+        root.left = self.min_tree(nums[:mid])
+        root.right = self.min_tree(nums[mid + 1:])
+        return root
+
+    def print_tree(self, treenode):
+        if not treenode:
+            return
+        print treenode
+        self.print_tree(treenode.left)
+        self.print_tree(treenode.right)
+
+
+    def route_graph(self, graph, n1, n2):
+        """
+        Given a directed graph see if there is a route between 2 nodes
+        :param graph: dict{int, list[int]}
+        :param n1: int
+        :param n2: int
+        :return: bool
+        """
+        print graph
+        if not n1 or not n2:
+            return False
+
+        if n1 == n2:
+            return True
+
+        # bfs
+        q = Queue.Queue()
+        q.put(n1)
+        while not q.empty():
+            popped = q.get()
+            print popped, n2
+            if popped == n2:
+                print "got it"
+                return True
+            for i in graph[popped]:
+                q.put(i)
+        print "nope"
+        return False
+
+        # try bidirectional search
+        # n1_q = Queue.Queue()
+        # n2_q = Queue.Queue()
+        #
+        # n1_q.put(n1)
+        # n2_q.put(n2)
+        # while not n1_q.empty() and not n2_q.empty():
+        #     popped_n1 = n1_q.get()
+        #     popped_n2 = n2_q.get()
+        #     print popped_n1, popped_n2
+        #
+        #     if popped_n1 != popped_n2:
+        #         if len(graph[popped_n1]) != 0:
+        #             for i in graph[popped_n1]:
+        #                 print i
+        #                 n1_q.put(i)
+        #         if len(graph[popped_n2]) != 0:
+        #             for j in graph[popped_n2]:
+        #                 print j
+        #                 n2_q.put(j)
+
 
     def loop_detection(self, head):
         """
@@ -563,6 +993,95 @@ class AnimalShelter(object):
         while animal:
             print animal
             animal = animal.next
+
+class BST(object):
+    def __init__(self, root=None):
+        self.root = root
+        self.curr = self.root
+
+    def __repr__(self):
+        return self.root
+
+    def insert(self, data):
+        if not data:
+            return
+        self.insert_helper(self.root, data)
+
+    def insert_helper(self, root, data):
+        add_node = TreeNode(data)
+        if not root:
+            return add_node
+        else:
+            if root.data < data:
+                if not root.right:
+                    root.right = add_node
+                else:
+                    self.insert_helper(root.right, data)
+            else:
+                if not root.left:
+                    root.left = add_node
+                else:
+                    self.insert_helper(root.left, data)
+        # iterative
+        # while root:
+        #     p = root
+        #     if root.data <= data:
+        #         root = root.right
+        #     else:
+        #         root = root.left
+        # if p.data <= data:
+        #     p.right = add_node
+        # else:
+        #     p.left = add_node
+        # return self.root
+
+    def find(self, node):
+        if not node or not self.root:
+            return
+        return self.find_helper(self.root, node)
+
+    def find_helper(self, curr, node):
+        if not curr or curr.data == node:
+            return curr
+        if curr.data < node:
+            return self.find_helper(curr.right, node)
+        if curr.data > node:
+            return self.find_helper(curr.left, note)
+
+
+    def min_val(self, node):
+        curr = node
+        while curr.left:
+            curr = curr.left
+        print curr
+        return curr
+
+    def delete(self, node):
+        if not node:
+            return False
+        self.delete_helper(self.root, node)
+
+    def delete_helper(self, root, key):
+        # doesnt exist so return it
+        if not root:
+            return root
+        if root.val > key:
+            root.left = self.delete_helper(root.left, key)
+        elif root.val < key:
+            root.right = self.delete_helper(root.right, key)
+        else:
+    #       1 or no children
+            if not root.left:
+                return root.right
+            if not root.right:
+                return root.left
+    #         with 2 child, get inorder successor
+    #       leftmost of right subtree
+            temp = self.min_val(root.right)
+            root.val = temp.data
+    #         delete successor
+            root.right = self.delete_helper(root.right, temp.val)
+        return root
 
 if __name__ == '__main__':
     main()
